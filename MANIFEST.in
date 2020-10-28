@@ -1,0 +1,2 @@
+recursive-include **/lib libRemoteInput*
+recursive-include **/lib/headers/ *.hxx
