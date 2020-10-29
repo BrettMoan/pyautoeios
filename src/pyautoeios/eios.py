@@ -96,8 +96,8 @@ from typing import Tuple
 import psutil
 
 try:
-    import importlib.resources
-    _LIB_DIR = importlib.resources.files(__package__) / 'lib'
+    from importlib.resources import files
+    _LIB_DIR = files(__package__) / 'lib'
 except ImportError:
     import pkg_resources
     import pathlib
@@ -128,9 +128,9 @@ class EIOS:
     """classvariable to hold the list of clients PIDS and their EIOS pointers"""
 
     if platform.system() == "Windows":
-        if sizeof(c_void_p) == 4
+        if sizeof(c_void_p) == 4:
             _dll_file = "libRemoteInput-i686.dll"
-        else
+        else:
             _dll_file = "libRemoteInput-x86_64.dll"
         _cdecl = CDLL(str(_LIB_DIR / _dll_file))
         _stdcall = WinDLL(str(_LIB_DIR / _dll_file))
@@ -147,7 +147,8 @@ class EIOS:
     """
 
     def __init__(self, pid=None):
-
+        self._eios_ptr = None
+        self._pid = None
         if not pid:
             pids = get_client_pids()
             for p in pids:
@@ -169,8 +170,10 @@ class EIOS:
         self._clients[pid] = self._eios_ptr
 
     def __del__(self):
-        self._EIOS_ReleaseTarget()
-        self._clients.pop(self._pid)
+        if self._eios_ptr:
+            self._EIOS_ReleaseTarget()
+        if self._pid:
+            self._clients.pop(self._pid)
 
     _stdcall.EIOS_RequestTarget.argtypes = [c_char_p]
     _stdcall.EIOS_RequestTarget.restype = EIOSPtr
@@ -213,7 +216,7 @@ class EIOS:
         std::uint8_t* EIOS_GetImageBuffer(EIOS* eios) noexcept;
         """
         buffer = self._stdcall.EIOS_GetImageBuffer(self._eios_ptr)
-        return buffer.contents
+        return buffer
 
     _stdcall.EIOS_GetDebugImageBuffer.argtypes = [EIOSPtr]
     _stdcall.EIOS_GetDebugImageBuffer.restype = POINTER(c_uint8)
@@ -223,7 +226,7 @@ class EIOS:
         std::uint8_t* EIOS_GetDebugImageBuffer(EIOS* eios) noexcept;
         """
         buffer = self._stdcall.EIOS_GetDebugImageBuffer(self._eios_ptr)
-        return buffer.contents
+        return buffer
 
     _stdcall.EIOS_SetGraphicsDebugging.argtypes = [EIOSPtr, c_bool]
     _stdcall.EIOS_SetGraphicsDebugging.restype = None

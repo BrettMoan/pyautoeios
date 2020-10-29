@@ -1,7 +1,7 @@
 import getpass
 
 from pyautoeios.eios import EIOS
-from pyautoeios.hex_keycodes import VK_ESC, VK_LBUTTON
+from pyautoeios.hexcodes import VK_ESC, VK_LBUTTON
 
 print("injecting into client")
 # Create instance of Remote Input
