@@ -1,16 +1,19 @@
 from typing import List
 from pyautoeios import eios
 from pyautoeios import hexcodes
-from pyautoeios import _pyscreeze_cv2_patch
+
 from pyautoeios import _pyscreeze_remoteinput_patch
 from pyautoeios import _pyautogui_remoteinput_patch
 
 import pyautogui
 pyautogui.platformModule = _pyautogui_remoteinput_patch
 pyautogui.screenshot = _pyscreeze_remoteinput_patch._screenshot_remoteinput
-pyautogui._load_cv2 = _pyscreeze_cv2_patch._load_cv2
-pyautogui._extract_alpha_cv2 = _pyscreeze_cv2_patch._extract_alpha_cv2
-pyautogui._locateAll_opencv = _pyscreeze_cv2_patch._locateAll_opencv
+
+if pyautogui.pyscreeze.useOpenCV:
+    from pyautoeios import _pyscreeze_cv2_patch
+    pyautogui.pyscreeze._load_cv2 = _pyscreeze_cv2_patch._load_cv2
+    pyautogui.pyscreeze._extract_alpha_cv2 = _pyscreeze_cv2_patch._extract_alpha_cv2
+    pyautogui.pyscreeze._locateAll_opencv = _pyscreeze_cv2_patch._locateAll_opencv
 
 # now that we've patched  pyautogui lets do simulate a `from pyuautogui import *`
 for attr in dir(pyautogui):

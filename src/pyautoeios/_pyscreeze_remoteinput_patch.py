@@ -50,9 +50,8 @@ def _screenshot_remoteinput(imageFilename=None, region=None):
     """compatibility wrapper for pyautogui."""
     buffer = EIOS.get_image_buffer(eios_obj)
     x, y = EIOS.get_target_dimensions(eios_obj)
-    array = np.asarray(buffer[:x * y * 4]).reshape((y, x, 4))[:,:,:3].astype(np.uint8)
-    im = Image.fromarray(array)
-    im.show()
+    np_image = np.asarray(buffer[:x * y * 4]).reshape((y, x, 4))[:,:,:3].astype(np.uint8)
+    im = Image.fromarray(np_image[:,:,::-1])
     if region is not None:
         assert len(region) == 4, 'region argument must be a tuple of four ints'
         region = [int(x) for x in region]

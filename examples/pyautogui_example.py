@@ -1,24 +1,36 @@
-import pyautogui
-import _pyautogui_remoteinput
 
-pyautogui.platformModule = _pyautogui_remoteinput
-reflect = pyautogui.platformModule.REFLECT
+import random
+import getpass
+from pyscreeze import Box
+import pyautoeios as pyauto
 
-reflect.EIOS_Inject()
+def move_to_spot_in_box(box, **kwargs):
+    print(f"box = {box}")
+    if 'duration' not in kwargs:
+        kwargs['duration'] = random.uniform(0.3,1.1)
+    if 'tween' not in kwargs:
+        kwargs['tween'] = pyauto.easeOutQuad
 
-# Get number of clients
-client_count = reflect.EIOS_GetClients()
-print(f"there are {client_count} clients")
+    cx,cy =  pyauto.center(box)
+    x = random.randint(int(-1*(box.width/3)),int(box.width/3)) + cx
+    y = random.randint(int(-1*(box.height/3)),int(box.height/3)) + cy 
+    print(f"x = {x}, y = {y}")
+    pyauto.moveTo(x, y, **kwargs)
 
-# Get first clients PID
-client_pid = reflect.EIOS_GetClientPID(0)
+def click_on_spot_in_box(box, **kwargs):
+    move_to_spot_in_box(box,**kwargs)
+    pyauto.click(**kwargs)
 
-# Pair the client and get the target or eios_ptr
-eios_ptr = reflect.EIOS_PairClient(client_pid)
-print(f"Pointer for the target for client is = {eios_ptr}")
 
-pyautogui.click(478, 294)
-pyautogui.click(375, 263)
-pyautogui.typewrite("password")
-pyautogui.click(329, 319)
-pyautogui.platformModule._size()
+pyauto.inject_clients()
+for client in pyauto.clients:
+    pyauto.pair_client(client)
+    click_on_spot_in_box(Box(left=398, top=271, width=148, height=40))
+    click_on_spot_in_box(Box(left=285, top=248, width=235, height=15))
+    pyauto.typewrite(getpass.getpass(), interval=0.7)
+    im = pyauto.screenshot()
+    im.show()
+    click_on_spot_in_box(Box(left=238, top=301, width=148,height=41))
+
+
+

@@ -40,8 +40,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import cv2
-import numpy
+try:
+    import cv2
+    import numpy
+    useOpenCV = True
+    RUNNING_CV_2 = cv2.__version__[0] < '3'
+except ImportError:
+    useOpenCV = False
 
 def _load_cv2(img, grayscale=None, alpha=False):
     """
