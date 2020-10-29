@@ -5,21 +5,31 @@ Work in progress port remote_input from https://github.com/Brandon-T/Reflection 
 Design decision was made to implements patches to https://github.com/asweigart/pyautogui/ and github.com/asweigart/pyscreeze so
 that the remote_input so that interface can be used.
 
-Goals include:
-[ ] integration of color and other methods https://github.com/BenLand100/srbot/tree/master/srbot
-[ ] porting modules from https://github.com/SRL/SRL or https://github.com/ollydev/SRL-Development
-[ ] porting of "reflection" modules from https://github.com/Brandon-T/Reflection
 
 
+Planned Features
+  - [x] Works with python 3.8
+  - [x] installable via pip
+  - [ ] Installs Dependancies for you for now use the [](/Pipfile)
+  - [x] Wraps well liked [pyautogui](https://github.com/asweigart/pyautogui/) interface
+  - [x] Transparent Image finding when opencv is installed
+  - [x] Injecting into multiple clients (so threads can be used for multi-boxing) 
+  - [x] no known memory leaks.
+
+Backlog Features:
+  - [ ] More examples?
+  - [ ] integration of color and other methods https://github.com/BenLand100/srbot/tree/master/srbot
+  - [ ] porting modules from https://github.com/SRL/SRL or https://github.com/ollydev/SRL-Development
+  - [ ] porting of "reflection" modules from https://github.com/Brandon-T/Reflection
 
 Current demo:
 
 ```python
-
 import random
 import getpass
 from pyscreeze import Box
 import pyautoeios as pyauto
+
 
 def move_to_spot_in_box(box, **kwargs):
     print(f"box = {box}")
@@ -34,10 +44,10 @@ def move_to_spot_in_box(box, **kwargs):
     print(f"x = {x}, y = {y}")
     pyauto.moveTo(x, y, **kwargs)
 
+
 def click_on_spot_in_box(box, **kwargs):
     move_to_spot_in_box(box,**kwargs)
     pyauto.click(**kwargs)
-
 
 pyauto.inject_clients()
 for client in pyauto.clients:
@@ -48,6 +58,5 @@ for client in pyauto.clients:
     im = pyauto.screenshot()
     im.show()
     click_on_spot_in_box(Box(left=238, top=301, width=148,height=41))
-
-
 ```
+
