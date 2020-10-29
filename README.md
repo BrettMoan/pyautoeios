@@ -10,7 +10,6 @@ that the remote_input so that interface can be used.
 Planned Features
   - [x] Works with python 3.8
   - [x] installable via pip
-  - [ ] Installs Dependancies for you for now use the [](/Pipfile)
   - [x] Wraps well liked [pyautogui](https://github.com/asweigart/pyautogui/) interface
   - [x] Transparent Image finding when opencv is installed
   - [x] Injecting into multiple clients (so threads can be used for multi-boxing) 
@@ -18,6 +17,7 @@ Planned Features
 
 Backlog Features:
   - [ ] More examples?
+  - [ ] Installs Dependancies for you (for now use the [Pipfile](/Pipfile))
   - [ ] integration of color and other methods https://github.com/BenLand100/srbot/tree/master/srbot
   - [ ] porting modules from https://github.com/SRL/SRL or https://github.com/ollydev/SRL-Development
   - [ ] porting of "reflection" modules from https://github.com/Brandon-T/Reflection
