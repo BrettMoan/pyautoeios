@@ -182,13 +182,20 @@ class EIOS:
 
     def __del__(self):
         if self._pid:
-            print(f"unpairing client {self._pid}")
+            print(f"unpairing client EIOS({self._pid})")
             for ref in self._objects.pop(self._pid).keys():
                 print(f"freeing {ref}")
                 self._Reflect_Release_Object(ref)
             self._clients.pop(self._pid)
         if self._eios_ptr:
             self._EIOS_ReleaseTarget()
+
+    def __str__(self):
+        return f"EIOS({self._pid})"
+
+    def __repr__(self):
+        return f"EIOS({self._pid})"
+
 
     _stdcall.EIOS_RequestTarget.argtypes = [c_char_p]
     _stdcall.EIOS_RequestTarget.restype = EIOSPtr

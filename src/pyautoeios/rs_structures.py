@@ -9,6 +9,13 @@ class RSType:
         eios._objects[eios._pid][ref] = eios._objects[eios._pid].get(ref,0) + 1
         print(f"refcount of {self.__class__.__name__}({ref}) = {eios._objects[eios._pid][ref]}")
 
+    def __str__(self):
+        return f"{self.__class__.__name__}({self.ref}) paired with EIOS({self.eios._pid})"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.ref}) paired with EIOS({self.eios._pid})"
+
+
     def __del__(self):
         ref_count = self.eios._objects[self.eios._pid][self.ref]
         if ref_count == 1:
