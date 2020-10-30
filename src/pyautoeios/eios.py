@@ -26,11 +26,9 @@ Working: (tested with vanilla client)
     [x] EIOS_SendString
 
 TODO:
-    [ ] ask brandon if theres a better around the "ValueError: Procedure probably called with too many arguments (4 bytes in excess)"  
-            exception when calling EIOS_Inject, other than loading the dll with CDLL('./libremoteinput.dll') for that one call.
 
     [ ] Functions that still need tested:
-        [ ] EIOS_GetImageBuffer 
+        [x] EIOS_GetImageBuffer 
         [ ] EIOS_GetDebugImageBuffer 
         [ ] EIOS_SetGraphicsDebugging 
         [ ] EIOS_UpdateImageBuffer 
@@ -48,20 +46,20 @@ TODO:
         [ ] Reflect_GetEIOS
     
     [ ] Functions that still need written:
-        [ ] Reflect_Object
+        [x] Reflect_Object
         [ ] Reflect_IsSame_Object
         [ ] Reflect_InstanceOf
-        [ ] Reflect_Release_Object
+        [x] Reflect_Release_Object
         [ ] Reflect_Release_Objects
-        [ ] Reflect_Bool
-        [ ] Reflect_Char
-        [ ] Reflect_Byte
-        [ ] Reflect_Short
-        [ ] Reflect_Int
-        [ ] Reflect_Long
+        [x] Reflect_Bool
+        [x] Reflect_Char
+        [x] Reflect_Byte
+        [x] Reflect_Short
+        [x] Reflect_Int
+        [x] Reflect_Long
         [ ] Reflect_Float
         [ ] Reflect_Double
-        [ ] Reflect_String
+        [x] Reflect_String
         [ ] Reflect_Array
         [ ] Reflect_Array_With_Size
         [ ] Reflect_Array_Size
@@ -70,35 +68,12 @@ TODO:
         [ ] Reflect_Array_Index3D
         [ ] Reflect_Array_Index4D
         [ ] Reflect_Array_Indices
-
-    [x] EIOS_MoveMouse seems broken, after calling it once, the next call to EIOS_GetMousePosition is really high
-        RESOLVED: was using pointer, for something that shouldn't be a pointer :/
-
-    [x] not sure how to properly capture the bool from EIOS_HasFocus. always getting c_bool(True)
-        RESOLVED: had to set `.restype` to a bool
 """
-from ctypes import (
-    CDLL,
-    WinDLL,
-    c_bool,
-    c_int,
-    c_int8,
-    c_int16,
-    c_int32,
-    c_int64,
-    POINTER,
-    byref,
-    c_char_p,
-    c_void_p,
-    c_uint8,
-    c_size_t,
-    c_char,
-    sizeof,
-    create_string_buffer,
-)
 
+import ctypes
 import platform
 from typing import Tuple
+
 import psutil
 
 try:
@@ -111,14 +86,14 @@ except ImportError:
 
 from pyautoeios.hooks import THook
 
-EIOSPtr = c_void_p
-JObject = c_void_p
-ClientOffset = c_int
-PID = c_int
-KeyCode = c_int32
-Coordinate = c_int32
-MouseButton = c_int32
-IntPtr = POINTER(c_int32)
+EIOSPtr = ctypes.c_void_p
+JObject = ctypes.c_void_p
+ClientOffset = ctypes.c_int
+PID = ctypes.c_int
+KeyCode = ctypes.c_int32
+Coordinate = ctypes.c_int32
+MouseButton = ctypes.c_int32
+IntPtr = ctypes.POINTER(ctypes.c_int32)
 
 CLIENTS = ["JagexLauncher.exe", "RuneLite.exe", "OpenOSRS.exe"]
 
@@ -138,18 +113,18 @@ class EIOS:
     """classvariable to hold the list of clients PIDS and their EIOS pointers"""
 
     if platform.system() == "Windows":
-        if sizeof(c_void_p) == 4:
+        if ctypes.sizeof(ctypes.c_void_p) == 4:
             _dll_file = "libRemoteInput-i686.dll"
         else:
             _dll_file = "libRemoteInput-x86_64.dll"
-        _cdecl = CDLL(str(_LIB_DIR / _dll_file))
-        _stdcall = WinDLL(str(_LIB_DIR / _dll_file))
+        _cdecl = ctypes.CDLL(str(_LIB_DIR / _dll_file))
+        _stdcall = ctypes.WinDLL(str(_LIB_DIR / _dll_file))
 
     elif platform.system() == "Darwin":
-        _cdecl = _stdcall = CDLL(str(_LIB_DIR / "libRemoteInput-x86_64.dylib"))
+        _cdecl = _stdcall = ctypes.CDLL(str(_LIB_DIR / "libRemoteInput-x86_64.dylib"))
 
     else:
-        _cdecl = _stdcall = CDLL(str(_LIB_DIR / "libRemoteInput-x86_64.so"))
+        _cdecl = _stdcall = ctypes.CDLL(str(_LIB_DIR / "libRemoteInput-x86_64.so"))
     """classvariable as libraries only need loaded once
 
     `EIOS.hxx` uses _cdecl
@@ -197,7 +172,7 @@ class EIOS:
         return f"EIOS({self._pid})"
 
 
-    _stdcall.EIOS_RequestTarget.argtypes = [c_char_p]
+    _stdcall.EIOS_RequestTarget.argtypes = [ctypes.c_char_p]
     _stdcall.EIOS_RequestTarget.restype = EIOSPtr
 
     def _EIOS_RequestTarget(self, initstr: str) -> EIOSPtr:
@@ -223,15 +198,15 @@ class EIOS:
         void EIOS_GetTargetDimensions(EIOS* eios, std::int32_t* width, std::int32_t* height) noexcept;
         :return: width, height
         """
-        width = c_int32()
-        height = c_int32()
+        width = ctypes.c_int32()
+        height = ctypes.c_int32()
         self._stdcall.EIOS_GetTargetDimensions(
-            self._eios_ptr, byref(width), byref(height)
+            self._eios_ptr, ctypes.byref(width), ctypes.byref(height)
         )
         return [width.value, height.value]
 
     _stdcall.EIOS_GetImageBuffer.argtypes = [EIOSPtr]
-    _stdcall.EIOS_GetImageBuffer.restype = POINTER(c_uint8)
+    _stdcall.EIOS_GetImageBuffer.restype = ctypes.POINTER(ctypes.c_uint8)
 
     def _EIOS_GetImageBuffer(self):
         """
@@ -241,7 +216,7 @@ class EIOS:
         return buffer
 
     _stdcall.EIOS_GetDebugImageBuffer.argtypes = [EIOSPtr]
-    _stdcall.EIOS_GetDebugImageBuffer.restype = POINTER(c_uint8)
+    _stdcall.EIOS_GetDebugImageBuffer.restype = ctypes.POINTER(ctypes.c_uint8)
 
     def _EIOS_GetDebugImageBuffer(self):
         """
@@ -250,7 +225,7 @@ class EIOS:
         buffer = self._stdcall.EIOS_GetDebugImageBuffer(self._eios_ptr)
         return buffer
 
-    _stdcall.EIOS_SetGraphicsDebugging.argtypes = [EIOSPtr, c_bool]
+    _stdcall.EIOS_SetGraphicsDebugging.argtypes = [EIOSPtr, ctypes.c_bool]
     _stdcall.EIOS_SetGraphicsDebugging.restype = None
 
     def _EIOS_SetGraphicsDebugging(self, enabled: bool):
@@ -269,7 +244,7 @@ class EIOS:
         self._stdcall.EIOS_UpdateImageBuffer(self._eios_ptr)
 
     _stdcall.EIOS_HasFocus.argtypes = [EIOSPtr]
-    _stdcall.EIOS_HasFocus.restype = c_bool
+    _stdcall.EIOS_HasFocus.restype = ctypes.c_bool
 
     def _EIOS_HasFocus(self) -> bool:
         """
@@ -296,7 +271,7 @@ class EIOS:
         self._stdcall.EIOS_LoseFocus(self._eios_ptr)
 
     _stdcall.EIOS_IsInputEnabled.argtypes = [EIOSPtr]
-    _stdcall.EIOS_IsInputEnabled.restype = c_bool
+    _stdcall.EIOS_IsInputEnabled.restype = ctypes.c_bool
 
     def _EIOS_IsInputEnabled(self) -> bool:
         """
@@ -304,7 +279,7 @@ class EIOS:
         """
         return self._stdcall.EIOS_IsInputEnabled(self._eios_ptr)
 
-    _stdcall.EIOS_SetInputEnabled.argtypes = [EIOSPtr, c_bool]
+    _stdcall.EIOS_SetInputEnabled.argtypes = [EIOSPtr, ctypes.c_bool]
     _stdcall.EIOS_SetInputEnabled.restype = None
 
     def _EIOS_SetInputEnabled(self, enabled: bool) -> None:
@@ -320,9 +295,9 @@ class EIOS:
         """
         void EIOS_GetMousePosition(EIOS* eios, std::int32_t* x, std::int32_t* y) noexcept;
         """
-        x = c_int32()
-        y = c_int32()
-        self._stdcall.EIOS_GetMousePosition(self._eios_ptr, byref(x), byref(y))
+        x = ctypes.c_int32()
+        y = ctypes.c_int32()
+        self._stdcall.EIOS_GetMousePosition(self._eios_ptr, ctypes.byref(x), ctypes.byref(y))
         return (x.value, y.value)
 
     _stdcall.EIOS_GetRealMousePosition.argtypes = [EIOSPtr, IntPtr, IntPtr]
@@ -332,9 +307,9 @@ class EIOS:
         """
         void EIOS_GetRealMousePosition(EIOS* eios, std::int32_t* x, std::int32_t* y) noexcept;
         """
-        x = c_int32()
-        y = c_int32()
-        self._stdcall.EIOS_GetRealMousePosition(self._eios_ptr, byref(x), byref(y))
+        x = ctypes.c_int32()
+        y = ctypes.c_int32()
+        self._stdcall.EIOS_GetRealMousePosition(self._eios_ptr, ctypes.byref(x), ctypes.byref(y))
         return (x.value, y.value)
 
     _stdcall.EIOS_MoveMouse.argtypes = [EIOSPtr, Coordinate, Coordinate]
@@ -346,7 +321,7 @@ class EIOS:
         """
         self._stdcall.EIOS_MoveMouse(self._eios_ptr, x, y)
 
-    _stdcall.EIOS_HoldMouse.argtypes = [EIOSPtr, Coordinate, Coordinate, c_int32]
+    _stdcall.EIOS_HoldMouse.argtypes = [EIOSPtr, Coordinate, Coordinate, ctypes.c_int32]
     _stdcall.EIOS_HoldMouse.restype = None
 
     def _EIOS_HoldMouse(self, x: int, y: int, button: int) -> None:
@@ -377,7 +352,7 @@ class EIOS:
     # always throws a `AttributeError: function 'EIOS_IsMouseButtonHeld' not found` ERROR
 
     # _stdcall.EIOS_IsMouseButtonHeld.argtypes = [EIOSPtr, MouseButton]
-    # _stdcall.EIOS_IsMouseButtonHeld.restype = c_bool
+    # _stdcall.EIOS_IsMouseButtonHeld.restype = ctypes.c_bool
 
     # def _EIOS_IsMouseButtonHeld(self, button: int) -> bool:
     #     """
@@ -385,7 +360,7 @@ class EIOS:
     #     """
     #     return self._stdcall.EIOS_IsMouseButtonHeld(self._eios_ptr, button)
 
-    _stdcall.EIOS_SendString.argtypes = [EIOSPtr, c_char_p, c_int32, c_int32]
+    _stdcall.EIOS_SendString.argtypes = [EIOSPtr, ctypes.c_char_p, ctypes.c_int32, ctypes.c_int32]
     _stdcall.EIOS_SendString.restype = None
 
     def _EIOS_SendString(self, text: str, keywait: int, keymodwait: int) -> None:
@@ -414,7 +389,7 @@ class EIOS:
         self._stdcall.EIOS_ReleaseKey(self._eios_ptr, key)
 
     _stdcall.EIOS_IsKeyHeld.argtypes = [EIOSPtr, KeyCode]
-    _stdcall.EIOS_IsKeyHeld.restype = c_bool
+    _stdcall.EIOS_IsKeyHeld.restype = ctypes.c_bool
 
     def _EIOS_IsKeyHeld(self, key: int) -> bool:
         """
@@ -423,7 +398,7 @@ class EIOS:
         return self._stdcall.EIOS_IsKeyHeld(self._eios_ptr, key)
 
     _stdcall.EIOS_GetKeyboardSpeed.argtypes = [EIOSPtr]
-    _stdcall.EIOS_GetKeyboardSpeed.restype = c_int32
+    _stdcall.EIOS_GetKeyboardSpeed.restype = ctypes.c_int32
 
     def _EIOS_GetKeyboardSpeed(self) -> int:
         """
@@ -431,7 +406,7 @@ class EIOS:
         """
         return self._stdcall.EIOS_GetKeyboardSpeed(self._eios_ptr)
 
-    _stdcall.EIOS_SetKeyboardSpeed.argtypes = [EIOSPtr, c_int32]
+    _stdcall.EIOS_SetKeyboardSpeed.argtypes = [EIOSPtr, ctypes.c_int32]
     _stdcall.EIOS_SetKeyboardSpeed.restype = None
 
     def _EIOS_SetKeyboardSpeed(self, speed: int) -> None:
@@ -441,7 +416,7 @@ class EIOS:
         self._stdcall.EIOS_SetKeyboardSpeed(self._eios_ptr, speed)
 
     _stdcall.EIOS_GetKeyboardRepeatDelay.argtypes = [EIOSPtr]
-    _stdcall.EIOS_GetKeyboardRepeatDelay.restype = c_int32
+    _stdcall.EIOS_GetKeyboardRepeatDelay.restype = ctypes.c_int32
 
     def _EIOS_GetKeyboardRepeatDelay(self) -> int:
         """
@@ -449,7 +424,7 @@ class EIOS:
         """
         return self._stdcall.EIOS_GetKeyboardRepeatDelay(self._eios_ptr)
 
-    _stdcall.EIOS_SetKeyboardRepeatDelay.argtypes = [EIOSPtr, c_int32]
+    _stdcall.EIOS_SetKeyboardRepeatDelay.argtypes = [EIOSPtr, ctypes.c_int32]
     _stdcall.EIOS_SetKeyboardRepeatDelay.restype = None
 
     def _EIOS_SetKeyboardRepeatDelay(self, delay: int) -> None:
@@ -495,8 +470,8 @@ class EIOS:
         """
         self._stdcall.EIOS_KillZombieClients(self._eios_ptr)
 
-    _stdcall.EIOS_GetClients.argtypes = [c_bool]
-    _stdcall.EIOS_GetClients.restype = c_size_t 
+    _stdcall.EIOS_GetClients.argtypes = [ctypes.c_bool]
+    _stdcall.EIOS_GetClients.restype = ctypes.c_size_t 
 
     def _EIOS_GetClients(self, unpaired_only: bool = False) -> int:
         """
@@ -510,7 +485,7 @@ class EIOS:
         """
         return self._stdcall.EIOS_GetClients(unpaired_only)
 
-    _stdcall.EIOS_GetClientPID.argtypes = [c_size_t]
+    _stdcall.EIOS_GetClientPID.argtypes = [ctypes.c_size_t]
     _stdcall.EIOS_GetClientPID.restype = PID
 
     def _EIOS_GetClientPID(self, index: int) -> int:
@@ -519,7 +494,7 @@ class EIOS:
         """
         return self._stdcall.EIOS_GetClientPID(index)
 
-    _cdecl.EIOS_Inject.argtypes = [c_char_p]
+    _cdecl.EIOS_Inject.argtypes = [ctypes.c_char_p]
     _cdecl.EIOS_Inject.restype = None
 
     def _EIOS_Inject(self, process_name: str = "JagexLauncher.exe") -> None:
@@ -547,7 +522,7 @@ class EIOS:
         return self._stdcall.Reflect_GetEIOS(pid)
 
 
-    _stdcall.Reflect_Object.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Object.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Object.restype = JObject
 
 
@@ -584,8 +559,8 @@ class EIOS:
     #     """
     #     pass
 
-    _stdcall.Reflect_Bool.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
-    _stdcall.Reflect_Bool.restype = c_bool
+    _stdcall.Reflect_Bool.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Bool.restype = ctypes.c_bool
 
     def _Reflect_Bool(self, jobject:JObject, hook:THook) -> bool:
         """
@@ -593,8 +568,8 @@ class EIOS:
         """
         return self._stdcall.Reflect_Bool(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
 
-    _stdcall.Reflect_Char.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
-    _stdcall.Reflect_Char.restype = c_char
+    _stdcall.Reflect_Char.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Char.restype = ctypes.c_char
 
     def _Reflect_Char(self, jobject:JObject, hook:THook) -> bytes:
         """
@@ -602,8 +577,8 @@ class EIOS:
         """
         return self._stdcall.Reflect_Char(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
 
-    _stdcall.Reflect_Byte.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
-    _stdcall.Reflect_Byte.restype = c_int8
+    _stdcall.Reflect_Byte.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Byte.restype = ctypes.c_int8
 
     def _Reflect_Byte(self, jobject:JObject, hook:THook) -> int:
         """
@@ -612,8 +587,8 @@ class EIOS:
         value = self._stdcall.Reflect_Byte(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
         return (value + 2**7) % 2**8 - 2**7
 
-    _stdcall.Reflect_Short.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
-    _stdcall.Reflect_Short.restype = c_int16
+    _stdcall.Reflect_Short.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Short.restype = ctypes.c_int16
 
     def _Reflect_Short(self, jobject:JObject, hook:THook) -> int:
         """
@@ -623,8 +598,8 @@ class EIOS:
         return (value + 2**15) % 2**16 - 2**15
 
 
-    _stdcall.Reflect_Int.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
-    _stdcall.Reflect_Int.restype = c_int32
+    _stdcall.Reflect_Int.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Int.restype = ctypes.c_int32
 
     def _Reflect_Int(self, jobject:JObject, hook:THook) -> int:
         """
@@ -633,8 +608,8 @@ class EIOS:
         value = self._stdcall.Reflect_Int(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
         return (value + 2**31) % 2**32 - 2**31
 
-    _stdcall.Reflect_Long.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
-    _stdcall.Reflect_Long.restype = c_int64
+    _stdcall.Reflect_Long.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Long.restype = ctypes.c_int64
 
     def _Reflect_Long(self, jobject:JObject, hook:THook) -> int:
         """
@@ -655,14 +630,14 @@ class EIOS:
     #     """
     #     pass
 
-    _stdcall.Reflect_String.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p, c_char_p, c_size_t]
+    _stdcall.Reflect_String.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_size_t]
     _stdcall.Reflect_String.restype = None
 
     def _Reflect_String(self, jobject:JObject, hook:THook, max_size=100):
         """
         void Reflect_String(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc, char* output, std::size_t output_size) noexcept;
         """
-        output = create_string_buffer(max_size)
+        output = ctypes.create_string_buffer(max_size)
         self._stdcall.Reflect_String(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"), output, max_size)
         return output.value
 
