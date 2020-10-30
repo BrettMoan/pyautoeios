@@ -82,13 +82,19 @@ from ctypes import (
     WinDLL,
     c_bool,
     c_int,
+    c_int8,
+    c_int16,
     c_int32,
+    c_int64,
     POINTER,
     byref,
     c_char_p,
     c_void_p,
     c_uint8,
+    c_size_t,
+    c_char,
     sizeof,
+    create_string_buffer,
 )
 
 import platform
@@ -103,7 +109,10 @@ except ImportError:
     import pathlib
     _LIB_DIR = pathlib.Path(pkg_resources.resource_filename(__package__, 'lib'))
 
+from pyautoeios.hooks import THook
+
 EIOSPtr = c_void_p
+JObject = c_void_p
 ClientOffset = c_int
 PID = c_int
 KeyCode = c_int32
@@ -125,6 +134,7 @@ class EIOS:
     """Class to wrap the remoteinput methods."""
 
     _clients = {}
+    _objects = {}
     """classvariable to hold the list of clients PIDS and their EIOS pointers"""
 
     if platform.system() == "Windows":
@@ -168,12 +178,17 @@ class EIOS:
             raise IOError("Couldn't find an available client.")
 
         self._clients[pid] = self._eios_ptr
+        self._objects[pid] = {}
 
     def __del__(self):
+        if self._pid:
+            print(f"unpairing client {self._pid}")
+            for ref in self._objects.pop(self._pid).keys():
+                print(f"freeing {ref}")
+                self._Reflect_Release_Object(ref)
+            self._clients.pop(self._pid)
         if self._eios_ptr:
             self._EIOS_ReleaseTarget()
-        if self._pid:
-            self._clients.pop(self._pid)
 
     _stdcall.EIOS_RequestTarget.argtypes = [c_char_p]
     _stdcall.EIOS_RequestTarget.restype = EIOSPtr
@@ -445,26 +460,36 @@ class EIOS:
         """
         return self._stdcall.EIOS_PairClient(pid)
 
-    # def _EIOS_KillClientPID(self, pid: int) -> None:
-    #     """
-    #     void EIOS_KillClientPID(pid_t pid) noexcept;
-    #     """
-    #     pass
+    _stdcall.EIOS_KillClientPID.argtypes = [PID]
+    _stdcall.EIOS_KillClientPID.restype = None
 
-    # def _EIOS_KillClient(self) -> None:
-    #     """
-    #     void EIOS_KillClient(EIOS* eios) noexcept;
-    #     """
-    #     pass
+    def _EIOS_KillClientPID(self, pid: int) -> None:
+        """
+        void EIOS_KillClientPID(pid_t pid) noexcept;
+        """
+        self._stdcall.EIOS_KillClientPID(pid)
 
-    # def _EIOS_KillZombieClients(self) -> None:
-    #     """
-    #     void EIOS_KillZombieClients() noexcept;
-    #     """
-    #     pass
+    _stdcall.EIOS_KillClient.argtypes = [EIOSPtr]
+    _stdcall.EIOS_KillClient.restype = None
+
+    def _EIOS_KillClient(self) -> None:
+        """
+        void EIOS_KillClient(EIOS* eios) noexcept;
+        """
+        self._stdcall.EIOS_KillClient(self._eios_ptr)
+
+
+    _stdcall.EIOS_KillZombieClients.argtypes = []
+    _stdcall.EIOS_KillZombieClients.restype = None
+
+    def _EIOS_KillZombieClients(self) -> None:
+        """
+        void EIOS_KillZombieClients() noexcept;
+        """
+        self._stdcall.EIOS_KillZombieClients(self._eios_ptr)
 
     _stdcall.EIOS_GetClients.argtypes = [c_bool]
-    _stdcall.EIOS_GetClients.restype = c_int
+    _stdcall.EIOS_GetClients.restype = c_size_t 
 
     def _EIOS_GetClients(self, unpaired_only: bool = False) -> int:
         """
@@ -478,7 +503,7 @@ class EIOS:
         """
         return self._stdcall.EIOS_GetClients(unpaired_only)
 
-    _stdcall.EIOS_GetClientPID.argtypes = [c_int]
+    _stdcall.EIOS_GetClientPID.argtypes = [c_size_t]
     _stdcall.EIOS_GetClientPID.restype = PID
 
     def _EIOS_GetClientPID(self, index: int) -> int:
@@ -494,7 +519,7 @@ class EIOS:
         """
         void EIOS_Inject(const char* process_name) noexcept;
         """
-        self._cdecl.EIOS_Inject(process_name.encode("utf-8"))
+        self._cdecl.EIOS_Inject(process_name.encode("utf8"))
 
     _cdecl.EIOS_Inject_PID.argtypes = [PID]
     _cdecl.EIOS_Inject_PID.restype = None
@@ -514,11 +539,16 @@ class EIOS:
         """
         return self._stdcall.Reflect_GetEIOS(pid)
 
-    # def _Reflect_Object(self, jobject object, const char* cls, const char* field, const char* desc):
-    #     """
-    #     jobject Reflect_Object(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+
+    _stdcall.Reflect_Object.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Object.restype = JObject
+
+
+    def _Reflect_Object(self, jobject:JObject, hook:THook):
+        """
+        jobject Reflect_Object(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        return self._stdcall.Reflect_Object(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
 
     # def _Reflect_IsSame_Object(self, jobject first, jobject second):
     #     """
@@ -526,17 +556,20 @@ class EIOS:
     #     """
     #     pass
 
-    # def _Reflect_InstanceOf(self, jobject object, const char* cls):
+    # def _Reflect_InstanceOf(self, jobject:JObject, const char* cls):
     #     """
     #     jboolean Reflect_InstanceOf(EIOS* eios, jobject object, const char* cls) noexcept;
     #     """
     #     pass
 
-    # def _Reflect_Release_Object(self, jobject object):
-    #     """
-    #     void Reflect_Release_Object(EIOS* eios, jobject object) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_Release_Object.argtypes = [EIOSPtr, JObject]
+    _stdcall.Reflect_Release_Object.restype = None
+
+    def _Reflect_Release_Object(self, jobject:JObject):
+        """
+        void Reflect_Release_Object(EIOS* eios, jobject object) noexcept;
+        """
+        self._stdcall.Reflect_Release_Object(self._eios_ptr, jobject)
 
     # def _Reflect_Release_Objects(self, jobject* objects, std::size_t amount):
     #     """
@@ -544,67 +577,95 @@ class EIOS:
     #     """
     #     pass
 
-    # def _Reflect_Bool(self, jobject object, const char* cls, const char* field, const char* desc):
-    #     """
-    #     bool Reflect_Bool(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_Bool.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Bool.restype = c_bool
 
-    # def _Reflect_Char(self, jobject object, const char* cls, const char* field, const char* desc):
-    #     """
-    #     char Reflect_Char(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    def _Reflect_Bool(self, jobject:JObject, hook:THook) -> bool:
+        """
+        bool Reflect_Bool(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        return self._stdcall.Reflect_Bool(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
 
-    # def _Reflect_Byte(self, jobject object, const char* cls, const char* field, const char* desc):
-    #     """
-    #     std::uint8_t Reflect_Byte(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_Char.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Char.restype = c_char
 
-    # def _Reflect_Short(self, jobject object, const char* cls, const char* field, const char* desc):
-    #     """
-    #     std::int16_t Reflect_Short(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    def _Reflect_Char(self, jobject:JObject, hook:THook) -> bytes:
+        """
+        char Reflect_Char(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        return self._stdcall.Reflect_Char(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
 
-    # def _Reflect_Int(self, jobject object, const char* cls, const char* field, const char* desc):
-    #     """
-    #     std::int32_t Reflect_Int(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_Byte.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Byte.restype = c_int8
 
-    # def _Reflect_Long(self, jobject object, const char* cls, const char* field, const char* desc):
-    #     """
-    #     std::int64_t Reflect_Long(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    def _Reflect_Byte(self, jobject:JObject, hook:THook) -> int:
+        """
+        std::uint8_t Reflect_Byte(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        value = self._stdcall.Reflect_Byte(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
+        return (value + 2**7) % 2**8 - 2**7
 
-    # def _Reflect_Float(self, jobject object, const char* cls, const char* field, const char* desc):
+    _stdcall.Reflect_Short.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Short.restype = c_int16
+
+    def _Reflect_Short(self, jobject:JObject, hook:THook) -> int:
+        """
+        std::int16_t Reflect_Short(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        value = self._stdcall.Reflect_Short(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
+        return (value + 2**15) % 2**16 - 2**15
+
+
+    _stdcall.Reflect_Int.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Int.restype = c_int32
+
+    def _Reflect_Int(self, jobject:JObject, hook:THook) -> int:
+        """
+        std::int32_t Reflect_Int(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        value = self._stdcall.Reflect_Int(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
+        return (value + 2**31) % 2**32 - 2**31
+
+    _stdcall.Reflect_Long.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p]
+    _stdcall.Reflect_Long.restype = c_int64
+
+    def _Reflect_Long(self, jobject:JObject, hook:THook) -> int:
+        """
+        std::int64_t Reflect_Long(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        value = self._stdcall.Reflect_Long(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
+        return (value + 2**63) % 2**64 - 2**63
+
+    # def _Reflect_Float(self, jobject:JObject, hook:THook) -> float:
     #     """
     #     float Reflect_Float(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
     #     """
     #     pass
 
-    # def _Reflect_Double(self, jobject object, const char* cls, const char* field, const char* desc):
+    # def _Reflect_Double(self, jobject:JObject, hook:THook) -> float:
     #     """
     #     double Reflect_Double(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
     #     """
     #     pass
 
-    # def _Reflect_String(self, jobject object, const char* cls, const char* field, const char* desc, char* output, std::size_t output_size):
-    #     """
-    #     void Reflect_String(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc, char* output, std::size_t output_size) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_String.argtypes = [EIOSPtr, JObject, c_char_p, c_char_p, c_char_p, c_char_p, c_size_t]
+    _stdcall.Reflect_String.restype = None
 
-    # def _Reflect_Array(self, jobject object, const char* cls, const char* field, const char* desc):
+    def _Reflect_String(self, jobject:JObject, hook:THook, max_size=100):
+        """
+        void Reflect_String(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc, char* output, std::size_t output_size) noexcept;
+        """
+        output = create_string_buffer(max_size)
+        self._stdcall.Reflect_String(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"), output, max_size)
+        return output.value
+
+    # def _Reflect_Array(self, jobject:JObject, hook:THook):
     #     """
     #     jarray Reflect_Array(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
     #     """
     #     pass
 
-    # def _Reflect_Array_With_Size(self, jobject object, std::size_t* output_size, const char* cls, const char* field, const char* desc):
+    # def _Reflect_Array_With_Size(self, jobject:JObject, std::size_t* output_size, hook:THook):
     #     """
     #     jarray Reflect_Array_With_Size(EIOS* eios, jobject object, std::size_t* output_size, const char* cls, const char* field, const char* desc) noexcept;
     #     """

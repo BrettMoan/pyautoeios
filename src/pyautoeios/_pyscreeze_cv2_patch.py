@@ -48,6 +48,18 @@ try:
 except ImportError:
     useOpenCV = False
 
+
+if useOpenCV:
+    if RUNNING_CV_2:
+        LOAD_COLOR = cv2.CV_LOAD_IMAGE_COLOR
+        LOAD_GRAYSCALE = cv2.CV_LOAD_IMAGE_GRAYSCALE
+    else:
+        LOAD_COLOR = cv2.IMREAD_COLOR
+        LOAD_GRAYSCALE = cv2.IMREAD_GRAYSCALE
+
+GRAYSCALE_DEFAULT = False
+USE_IMAGE_NOT_FOUND_EXCEPTION = False
+
 def _load_cv2(img, grayscale=None, alpha=False):
     """
     TODO
@@ -59,7 +71,7 @@ def _load_cv2(img, grayscale=None, alpha=False):
 
     if grayscale is None:
         grayscale = GRAYSCALE_DEFAULT
-    if isinstance(img, (str, unicode)):
+    if isinstance(img, str):
         # The function imread loads an image from the specified file and
         # returns it. If the image cannot be read (because of missing
         # file, improper permissions, unsupported or invalid format),

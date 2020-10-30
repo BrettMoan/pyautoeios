@@ -94,7 +94,7 @@ VK_KANJI = 0x19
 VK_IME_OFF = 0x1A
 """IME Off"""
 
-VK_ESCAPE = 0x1B
+VK_ESC = VK_ESCAPE = 0x1B
 """ESC key"""
 
 VK_CONVERT = 0x1C
