@@ -50,6 +50,7 @@ from pyautoeios.hexcodes import VK_LBUTTON, VK_RBUTTON, VK_MBUTTON
 eios_obj = None
 """Global Shared Memory pointer used to interact with the RemoteLib"""
 
+
 def _position():
     """compatibility wrapper for pyautogui."""
     return EIOS._EIOS_GetMousePosition(eios_obj)
@@ -89,7 +90,7 @@ def _mouseUp(x, y, button):
 def _keyDown(key):
     """
     compatibility wrapper for pyautogui.
-    
+
     modified from windows verison in pyautogui._pyautogui_win
     """
     if key not in keyboardMapping or keyboardMapping[key] is None:

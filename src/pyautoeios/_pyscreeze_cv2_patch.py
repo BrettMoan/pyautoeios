@@ -43,8 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 try:
     import cv2
     import numpy
+
     useOpenCV = True
-    RUNNING_CV_2 = cv2.__version__[0] < '3'
+    RUNNING_CV_2 = cv2.__version__[0] < "3"
 except ImportError:
     useOpenCV = False
 
@@ -59,6 +60,7 @@ if useOpenCV:
 
 GRAYSCALE_DEFAULT = False
 USE_IMAGE_NOT_FOUND_EXCEPTION = False
+
 
 def _load_cv2(img, grayscale=None, alpha=False):
     """
@@ -84,37 +86,39 @@ def _load_cv2(img, grayscale=None, alpha=False):
         else:
             img_cv = cv2.imread(img, LOAD_COLOR)
         if img_cv is None:
-            raise IOError("Failed to read %s because file is missing, "
-                          "has improper permissions, or is an "
-                          "unsupported or invalid format" % img)
+            raise IOError(
+                "Failed to read %s because file is missing, "
+                "has improper permissions, or is an "
+                "unsupported or invalid format" % img
+            )
     elif isinstance(img, numpy.ndarray):
         # don't try to convert an already-gray image to gray
         if grayscale and len(img.shape) == 3:  # and img.shape[2] == 3:
             img_cv = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         else:
             img_cv = img
-    elif hasattr(img, 'convert'):
+    elif hasattr(img, "convert"):
         # assume its a PIL.Image, convert to cv format
-        img_array = numpy.array(img.convert('RGB'))
+        img_array = numpy.array(img.convert("RGB"))
         img_cv = img_array[:, :, ::-1].copy()  # -1 does RGB -> BGR
         if grayscale:
             img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     else:
-        raise TypeError('expected an image filename, OpenCV numpy array, or PIL image')
+        raise TypeError("expected an image filename, OpenCV numpy array, or PIL image")
     return img_cv
 
-def _extract_alpha_cv2(img, hardedge = True):
+
+def _extract_alpha_cv2(img, hardedge=True):
     """ assigns a solid white/black to a mask based off of the alpha channel, then converts the image to COLOR_BGRA2BGR"""
 
-    # [:,:,3] returns the alpha channel. we could also use  cv2.split(img)[3], but split is a costly operation (in terms of time), 
+    # [:,:,3] returns the alpha channel. we could also use  cv2.split(img)[3], but split is a costly operation (in terms of time),
     # so only use it if necessary. Numpy indexing is much more efficient and should be used if possible.
-    mask = numpy.array(img[:,:,3])
-    
-    # 
-    if hardedge: 
-        mask[0][ mask[0] <= 128 ] = 0
-        mask[0][ mask[0] >  128 ] = 255
+    mask = numpy.array(img[:, :, 3])
 
+    #
+    if hardedge:
+        mask[0][mask[0] <= 128] = 0
+        mask[0][mask[0] > 128] = 255
 
     mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
@@ -122,9 +126,17 @@ def _extract_alpha_cv2(img, hardedge = True):
     return img, mask
 
 
-
-def _locateAll_opencv(needleImage, haystackImage, grayscale=None, limit=10000, region=None, step=1,
-                      confidence=0.999, alpha=False, method=cv2.TM_CCOEFF_NORMED):
+def _locateAll_opencv(
+    needleImage,
+    haystackImage,
+    grayscale=None,
+    limit=10000,
+    region=None,
+    step=1,
+    confidence=0.999,
+    alpha=False,
+    method=cv2.TM_CCOEFF_NORMED,
+):
     """
     TODO - rewrite this
         faster but more memory-intensive than pure python
@@ -136,7 +148,7 @@ def _locateAll_opencv(needleImage, haystackImage, grayscale=None, limit=10000, r
           - RGBA images are treated as RBG (ignores alpha channel unless alpha keyword is used, then needle can use alpha channel)
           - OpenCV hasn't impelmented alpha transparent matching except on two methods cv2.TM_SQDIFF and cv2.TM_CCORR_NORMED
             https://stackoverflow.com/questions/35658323/python-opencv-matchtemplate-is-mask-feature-implemented
-           
+
     """
     if grayscale is None:
         grayscale = GRAYSCALE_DEFAULT
@@ -148,14 +160,19 @@ def _locateAll_opencv(needleImage, haystackImage, grayscale=None, limit=10000, r
     haystackImage = _load_cv2(haystackImage, grayscale=grayscale)
 
     if region:
-        haystackImage = haystackImage[region[1]:region[1]+region[3],
-                                      region[0]:region[0]+region[2]]
+        haystackImage = haystackImage[
+            region[1] : region[1] + region[3], region[0] : region[0] + region[2]
+        ]
     else:
         region = (0, 0)  # full image; these values used in the yield statement
-    if (haystackImage.shape[0] < needleImage.shape[0] or
-        haystackImage.shape[1] < needleImage.shape[1]):
+    if (
+        haystackImage.shape[0] < needleImage.shape[0]
+        or haystackImage.shape[1] < needleImage.shape[1]
+    ):
         # avoid semi-cryptic OpenCV error below if bad size
-        raise ValueError('needle dimension(s) exceed the haystack image or region dimensions')
+        raise ValueError(
+            "needle dimension(s) exceed the haystack image or region dimensions"
+        )
 
     if step == 2:
         confidence *= 0.95
@@ -164,10 +181,11 @@ def _locateAll_opencv(needleImage, haystackImage, grayscale=None, limit=10000, r
     else:
         step = 1
 
-        
     if alpha and needleImage.shape[2] > 3:
         needleImage, transparent_mask = _extract_alpha_cv2(needleImage)
-        result = cv2.matchTemplate(haystackImage, needleImage, method, mask = transparent_mask)
+        result = cv2.matchTemplate(
+            haystackImage, needleImage, method, mask=transparent_mask
+        )
 
     else:
         result = cv2.matchTemplate(haystackImage, needleImage, method)
@@ -184,7 +202,9 @@ def _locateAll_opencv(needleImage, haystackImage, grayscale=None, limit=10000, r
 
     if len(matches[0]) == 0:
         if USE_IMAGE_NOT_FOUND_EXCEPTION:
-            raise ImageNotFoundException('Could not locate the image (highest confidence = %.3f)' % result.max())
+            raise ImageNotFoundException(
+                "Could not locate the image (highest confidence = %.3f)" % result.max()
+            )
         else:
             return
 

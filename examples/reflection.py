@@ -1,23 +1,20 @@
+import ctypes
 import pyautoeios as pyauto
 from pyautoeios import hooks
 
 from pyautoeios.rs_player import me
 
 pyauto.inject_clients()
-client=pyauto.clients[0]
+client = pyauto.clients[0]
 pyauto.pair_client(client)
 print(f"{client = }")
-
-print(client._Reflect_Int(None, hooks.CLIENT_LOGINSTATE))
-
 local_player = me(client)
 print(f"{local_player = }")
-
-local_player2 = me(client)
-print(f"{local_player2 = }")
-
 name = local_player.name()
 print(f"{name = }")
 
-name2 = local_player2.name()
-print(f"{name2 = }")
+for skill_name in local_player.SKILL_KEYS.keys():
+    level = local_player.level(skill_name)
+    max_level = local_player.max_level(skill_name)
+    experience = local_player.experience(skill_name)
+    print(f"{skill_name}: {level = }, {max_level = }, {experience = }")

@@ -71,6 +71,7 @@ TODO:
 """
 
 import ctypes
+from enum import Enum
 import platform
 from typing import Tuple
 
@@ -78,16 +79,19 @@ import psutil
 
 try:
     from importlib.resources import files
-    _LIB_DIR = files(__package__) / 'lib'
+
+    _LIB_DIR = files(__package__) / "lib"
 except ImportError:
     import pkg_resources
     import pathlib
-    _LIB_DIR = pathlib.Path(pkg_resources.resource_filename(__package__, 'lib'))
+
+    _LIB_DIR = pathlib.Path(pkg_resources.resource_filename(__package__, "lib"))
 
 from pyautoeios.hooks import THook
 
 EIOSPtr = ctypes.c_void_p
 JObject = ctypes.c_void_p
+JArray = ctypes.c_void_p
 ClientOffset = ctypes.c_int
 PID = ctypes.c_int
 KeyCode = ctypes.c_int32
@@ -96,6 +100,20 @@ MouseButton = ctypes.c_int32
 IntPtr = ctypes.POINTER(ctypes.c_int32)
 
 CLIENTS = ["JagexLauncher.exe", "RuneLite.exe", "OpenOSRS.exe"]
+
+
+class ReflectionArrayType(Enum):
+    RI_CHAR = 0
+    RI_BYTE = 1
+    RI_BOOLEAN = 2
+    RI_SHORT = 3
+    RI_INT = 4
+    RI_LONG = 5
+    RI_FLOAT = 6
+    RI_DOUBLE = 7
+    RI_STRING = 8
+    RI_OBJECT = 9
+
 
 def get_client_pids() -> dict:
     return {
@@ -170,7 +188,6 @@ class EIOS:
 
     def __repr__(self):
         return f"EIOS({self._pid})"
-
 
     _stdcall.EIOS_RequestTarget.argtypes = [ctypes.c_char_p]
     _stdcall.EIOS_RequestTarget.restype = EIOSPtr
@@ -297,7 +314,9 @@ class EIOS:
         """
         x = ctypes.c_int32()
         y = ctypes.c_int32()
-        self._stdcall.EIOS_GetMousePosition(self._eios_ptr, ctypes.byref(x), ctypes.byref(y))
+        self._stdcall.EIOS_GetMousePosition(
+            self._eios_ptr, ctypes.byref(x), ctypes.byref(y)
+        )
         return (x.value, y.value)
 
     _stdcall.EIOS_GetRealMousePosition.argtypes = [EIOSPtr, IntPtr, IntPtr]
@@ -309,7 +328,9 @@ class EIOS:
         """
         x = ctypes.c_int32()
         y = ctypes.c_int32()
-        self._stdcall.EIOS_GetRealMousePosition(self._eios_ptr, ctypes.byref(x), ctypes.byref(y))
+        self._stdcall.EIOS_GetRealMousePosition(
+            self._eios_ptr, ctypes.byref(x), ctypes.byref(y)
+        )
         return (x.value, y.value)
 
     _stdcall.EIOS_MoveMouse.argtypes = [EIOSPtr, Coordinate, Coordinate]
@@ -360,7 +381,12 @@ class EIOS:
     #     """
     #     return self._stdcall.EIOS_IsMouseButtonHeld(self._eios_ptr, button)
 
-    _stdcall.EIOS_SendString.argtypes = [EIOSPtr, ctypes.c_char_p, ctypes.c_int32, ctypes.c_int32]
+    _stdcall.EIOS_SendString.argtypes = [
+        EIOSPtr,
+        ctypes.c_char_p,
+        ctypes.c_int32,
+        ctypes.c_int32,
+    ]
     _stdcall.EIOS_SendString.restype = None
 
     def _EIOS_SendString(self, text: str, keywait: int, keymodwait: int) -> None:
@@ -460,7 +486,6 @@ class EIOS:
         """
         self._stdcall.EIOS_KillClient(self._eios_ptr)
 
-
     _stdcall.EIOS_KillZombieClients.argtypes = []
     _stdcall.EIOS_KillZombieClients.restype = None
 
@@ -471,7 +496,7 @@ class EIOS:
         self._stdcall.EIOS_KillZombieClients(self._eios_ptr)
 
     _stdcall.EIOS_GetClients.argtypes = [ctypes.c_bool]
-    _stdcall.EIOS_GetClients.restype = ctypes.c_size_t 
+    _stdcall.EIOS_GetClients.restype = ctypes.c_size_t
 
     def _EIOS_GetClients(self, unpaired_only: bool = False) -> int:
         """
@@ -521,16 +546,26 @@ class EIOS:
         """
         return self._stdcall.Reflect_GetEIOS(pid)
 
-
-    _stdcall.Reflect_Object.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Object.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
     _stdcall.Reflect_Object.restype = JObject
 
-
-    def _Reflect_Object(self, jobject:JObject, hook:THook):
+    def _Reflect_Object(self, jobject: JObject, hook: THook):
         """
         jobject Reflect_Object(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
         """
-        return self._stdcall.Reflect_Object(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
+        return self._stdcall.Reflect_Object(
+            self._eios_ptr,
+            jobject,
+            hook.cls,
+            hook.field,
+            hook.desc,
+        )
 
     # def _Reflect_IsSame_Object(self, jobject first, jobject second):
     #     """
@@ -547,7 +582,7 @@ class EIOS:
     _stdcall.Reflect_Release_Object.argtypes = [EIOSPtr, JObject]
     _stdcall.Reflect_Release_Object.restype = None
 
-    def _Reflect_Release_Object(self, jobject:JObject):
+    def _Reflect_Release_Object(self, jobject: JObject):
         """
         void Reflect_Release_Object(EIOS* eios, jobject object) noexcept;
         """
@@ -559,64 +594,147 @@ class EIOS:
     #     """
     #     pass
 
-    _stdcall.Reflect_Bool.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Bool.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
     _stdcall.Reflect_Bool.restype = ctypes.c_bool
 
-    def _Reflect_Bool(self, jobject:JObject, hook:THook) -> bool:
+    def _Reflect_Bool(self, jobject: JObject, hook: THook) -> bool:
         """
         bool Reflect_Bool(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
         """
-        return self._stdcall.Reflect_Bool(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
+        return self._stdcall.Reflect_Bool(
+            self._eios_ptr,
+            jobject,
+            hook.cls,
+            hook.field,
+            hook.desc,
+        )
 
-    _stdcall.Reflect_Char.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Char.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
     _stdcall.Reflect_Char.restype = ctypes.c_char
 
-    def _Reflect_Char(self, jobject:JObject, hook:THook) -> bytes:
+    def _Reflect_Char(self, jobject: JObject, hook: THook) -> bytes:
         """
         char Reflect_Char(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
         """
-        return self._stdcall.Reflect_Char(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"))
+        return self._stdcall.Reflect_Char(
+            self._eios_ptr,
+            jobject,
+            hook.cls,
+            hook.field,
+            hook.desc,
+        )
 
-    _stdcall.Reflect_Byte.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Byte.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
     _stdcall.Reflect_Byte.restype = ctypes.c_int8
 
-    def _Reflect_Byte(self, jobject:JObject, hook:THook) -> int:
+    def _Reflect_Byte(self, jobject: JObject, hook: THook) -> int:
         """
         std::uint8_t Reflect_Byte(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
         """
-        value = self._stdcall.Reflect_Byte(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
-        return (value + 2**7) % 2**8 - 2**7
+        value = (
+            self._stdcall.Reflect_Byte(
+                self._eios_ptr,
+                jobject,
+                hook.cls,
+                hook.field,
+                hook.desc,
+            )
+            * hook.multiplier
+        )
+        return (value + 2 ** 7) % 2 ** 8 - 2 ** 7
 
-    _stdcall.Reflect_Short.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Short.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
     _stdcall.Reflect_Short.restype = ctypes.c_int16
 
-    def _Reflect_Short(self, jobject:JObject, hook:THook) -> int:
+    def _Reflect_Short(self, jobject: JObject, hook: THook) -> int:
         """
         std::int16_t Reflect_Short(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
         """
-        value = self._stdcall.Reflect_Short(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
-        return (value + 2**15) % 2**16 - 2**15
+        value = (
+            self._stdcall.Reflect_Short(
+                self._eios_ptr,
+                jobject,
+                hook.cls,
+                hook.field,
+                hook.desc,
+            )
+            * hook.multiplier
+        )
+        return (value + 2 ** 15) % 2 ** 16 - 2 ** 15
 
-
-    _stdcall.Reflect_Int.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Int.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
     _stdcall.Reflect_Int.restype = ctypes.c_int32
 
-    def _Reflect_Int(self, jobject:JObject, hook:THook) -> int:
+    def _Reflect_Int(self, jobject: JObject, hook: THook) -> int:
         """
         std::int32_t Reflect_Int(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
         """
-        value = self._stdcall.Reflect_Int(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
-        return (value + 2**31) % 2**32 - 2**31
+        value = (
+            self._stdcall.Reflect_Int(
+                self._eios_ptr,
+                jobject,
+                hook.cls,
+                hook.field,
+                hook.desc,
+            )
+            * hook.multiplier
+        )
+        return (value + 2 ** 31) % 2 ** 32 - 2 ** 31
 
-    _stdcall.Reflect_Long.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
+    _stdcall.Reflect_Long.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
     _stdcall.Reflect_Long.restype = ctypes.c_int64
 
-    def _Reflect_Long(self, jobject:JObject, hook:THook) -> int:
+    def _Reflect_Long(self, jobject: JObject, hook: THook) -> int:
         """
         std::int64_t Reflect_Long(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
         """
-        value = self._stdcall.Reflect_Long(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8")) * hook.multiplier
-        return (value + 2**63) % 2**64 - 2**63
+        value = (
+            self._stdcall.Reflect_Long(
+                self._eios_ptr,
+                jobject,
+                hook.cls,
+                hook.field,
+                hook.desc,
+            )
+            * hook.multiplier
+        )
+        return (value + 2 ** 63) % 2 ** 64 - 2 ** 63
 
     # def _Reflect_Float(self, jobject:JObject, hook:THook) -> float:
     #     """
@@ -630,22 +748,53 @@ class EIOS:
     #     """
     #     pass
 
-    _stdcall.Reflect_String.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_size_t]
+    _stdcall.Reflect_String.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_size_t,
+    ]
     _stdcall.Reflect_String.restype = None
 
-    def _Reflect_String(self, jobject:JObject, hook:THook, max_size=100):
+    def _Reflect_String(self, jobject: JObject, hook: THook, max_size=100):
         """
         void Reflect_String(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc, char* output, std::size_t output_size) noexcept;
         """
         output = ctypes.create_string_buffer(max_size)
-        self._stdcall.Reflect_String(self._eios_ptr, jobject, hook.cls.encode("utf8"), hook.field.encode("utf8"), hook.desc.encode("utf8"), output, max_size)
+        self._stdcall.Reflect_String(
+            self._eios_ptr,
+            jobject,
+            hook.cls,
+            hook.field,
+            hook.desc,
+            output,
+            max_size,
+        )
         return output.value
 
-    # def _Reflect_Array(self, jobject:JObject, hook:THook):
-    #     """
-    #     jarray Reflect_Array(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_Array.argtypes = [
+        EIOSPtr,
+        JObject,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+    ]
+    _stdcall.Reflect_Array.restype = JObject
+
+    def _Reflect_Array(self, jobject: JObject, hook: THook):
+        """
+        jarray Reflect_Array(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
+        """
+        return self._stdcall.Reflect_Array(
+            self._eios_ptr,
+            jobject,
+            hook.cls,
+            hook.field,
+            hook.desc,
+        )
 
     # def _Reflect_Array_With_Size(self, jobject:JObject, std::size_t* output_size, hook:THook):
     #     """
@@ -653,37 +802,57 @@ class EIOS:
     #     """
     #     pass
 
-    # def _Reflect_Array_Size(self, jarray array):
-    #     """
-    #     std::size_t Reflect_Array_Size(EIOS* eios, jarray array) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_Array_Size.argtypes = [EIOSPtr, JArray]
+    _stdcall.Reflect_Array_Size.restype = ctypes.c_size_t
 
-    # def _Reflect_Array_Index(self, jarray array, ReflectionArrayType type, std::size_t index, std::size_t length):
-    #     """
-    #     void* Reflect_Array_Index(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t index, std::size_t length) noexcept;
-    #     """
-    #     pass
+    def _Reflect_Array_Size(self, jarray: JArray):
+        """
+        std::size_t Reflect_Array_Size(EIOS* eios, jarray array) noexcept;
+        """
+        return self._stdcall.Reflect_Array_Size(self._eios_ptr, jarray)
 
-    # def _Reflect_Array_Index2D(self, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y):
+    _stdcall.Reflect_Array_Index.argtypes = [
+        EIOSPtr,
+        JArray,
+        ctypes.c_uint,
+        ctypes.c_size_t,
+        ctypes.c_size_t,
+    ]
+    _stdcall.Reflect_Array_Index.restype = ctypes.c_void_p
+
+    def _Reflect_Array_Index(
+        self,
+        jarray: JArray,
+        data_type: int,
+        index: ctypes.c_size_t,
+        length: ctypes.c_size_t,
+    ):
+        """
+        void* Reflect_Array_Index(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t index, std::size_t length) noexcept;
+        """
+        return self._stdcall.Reflect_Array_Index(
+            self._eios_ptr, jarray, data_type, index, length
+        )
+
+    # def _Reflect_Array_Index2D(self, jarray:JArray, data_type:int, std::size_t length, std::int32_t x, std::int32_t y):
     #     """
     #     void* Reflect_Array_Index2D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y) noexcept;
     #     """
     #     pass
 
-    # def _Reflect_Array_Index3D(self, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z):
+    # def _Reflect_Array_Index3D(self, jarray:JArray, data_type:int, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z):
     #     """
     #     void* Reflect_Array_Index3D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z) noexcept;
     #     """
     #     pass
 
-    # def _Reflect_Array_Index4D(self, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z, std::int32_t w):
+    # def _Reflect_Array_Index4D(self, jarray:JArray, data_type:int, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z, std::int32_t w):
     #     """
     #     void* Reflect_Array_Index4D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z, std::int32_t w) noexcept;
     #     """
     #     pass
 
-    # def _Reflect_Array_Indices(self, jarray array, ReflectionArrayType type, std::int32_t* indices, std::size_t length):
+    # def _Reflect_Array_Indices(self, jarray:JArray, data_type:int, std::int32_t* indices, std::size_t length):
     #     """
     #     void* Reflect_Array_Indices(EIOS* eios, jarray array, ReflectionArrayType type, std::int32_t* indices, std::size_t length) noexcept;
     #     """

@@ -43,22 +43,26 @@ import numpy as np
 from PIL import Image
 
 from pyautoeios.eios import EIOS
+
 eios_obj = None
 """Global Shared Memory pointer used to interact with the RemoteLib"""
 
+
 def _screenshot_remoteinput(imageFilename=None, region=None):
-    """compatibility wrapper for pyautogui.""" 
+    """compatibility wrapper for pyautogui."""
     buffer = EIOS.get_image_buffer(eios_obj)
     x, y = EIOS.get_target_dimensions(eios_obj)
-    np_image = np.asarray(buffer[:x * y * 4]).reshape((y, x, 4))
-    im = Image.fromarray(np_image[:,:,:3].astype(np.uint8)[:,:,::-1])
+    np_image = np.asarray(buffer[: x * y * 4]).reshape((y, x, 4))
+    im = Image.fromarray(np_image[:, :, :3].astype(np.uint8)[:, :, ::-1])
 
     if region is not None:
-        assert len(region) == 4, 'region argument must be a tuple of four ints'
+        assert len(region) == 4, "region argument must be a tuple of four ints"
         region = [int(x) for x in region]
-        im = im.crop((region[0], region[1], region[2] + region[0], region[3] + region[1]))
+        im = im.crop(
+            (region[0], region[1], region[2] + region[0], region[3] + region[1])
+        )
     if imageFilename == "im.show()":
-      im.show()
+        im.show()
     elif imageFilename is not None:
         im.save(imageFilename)
     return im

@@ -4,23 +4,23 @@ Hexcodes for Virtual Keyboard as defined by Microsoft.
 https://msdn.microsoft.com/en-us/library/dd375731
 """
 
-#   0x07     # Undefined     
-#   0x0A-0B  # Reserved      
-#   0x0E-0F  # Undefined     
-#   0x3A-40  # Undefined     
-#   # 0x5E   # Reserved      
-#   0x88-8F  # Unassigned    
-#   0x92-96  # OEM specific  
-#   0x97-9F  # Unassigned    
-#   0xB8-B9  # Reserved      
-#   0xC1-D7  # Reserved      
-#   0xD8-DA  # Unassigned    
-#   0xE0     # Reserved      
-#   0xE1     # OEM specific  
-#   0xE3-E4  # OEM specific  
-#   0xE6     # OEM specific  
-#   0xE8     # Unassigned    
-#   0xE9-F5  # OEM specific  
+#   0x07     # Undefined
+#   0x0A-0B  # Reserved
+#   0x0E-0F  # Undefined
+#   0x3A-40  # Undefined
+#   # 0x5E   # Reserved
+#   0x88-8F  # Unassigned
+#   0x92-96  # OEM specific
+#   0x97-9F  # Unassigned
+#   0xB8-B9  # Reserved
+#   0xC1-D7  # Reserved
+#   0xD8-DA  # Unassigned
+#   0xE0     # Reserved
+#   0xE1     # OEM specific
+#   0xE3-E4  # OEM specific
+#   0xE6     # OEM specific
+#   0xE8     # Unassigned
+#   0xE9-F5  # OEM specific
 
 VK_LBUTTON = 0x01
 """Left mouse button"""
