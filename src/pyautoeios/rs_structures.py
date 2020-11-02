@@ -13,6 +13,27 @@ RI_STRING = 8
 RI_OBJECT = 9
 
 
+from io import StringIO
+from html.parser import HTMLParser
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs= True
+        self.text = StringIO()
+    def handle_data(self, d):
+        self.text.write(d)
+    def get_data(self):
+        return self.text.getvalue()
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+
 class RSType:
     def __init__(self, eios: EIOS = None, ref=None):
         self.eios = eios
@@ -60,22 +81,14 @@ class RSArray(RSType):
         else:
             return self.elements[key]
 
-    # def all(self, refresh: bool = False):
-    #     print(f"{refresh = } , {self.elements = }, {bool(refresh or not self.elements) = }")
-    #     if refresh or not self.elements:
-    #         if not self.size:
-    #             self.size = self.eios._Reflect_Array_Size(self.ref)
-    #         elements = self.eios._Reflect_Array_Index(self.ref, self.ra_type, 0, self.size)
-    #         print(f"{type(self.ctype)} = ")
-    #         print(f"{type(elements)} = ")
-    #         self.elements = []
-    #         pi = ctypes.cast(elements, ctypes.POINTER(self.ctype))
-    #         print(f"{pi = }")
-    #         for i in range(0,self.size):
-    #             print(f"{i = }")
-    #             self.elements.append(pi[i])
-    #         print(f"{self.elements = }")
-    #     return self.elements
+    def all(self, refresh: bool = False):
+        if refresh or not self.elements:
+            if not self.size:
+                self.size = self.eios._Reflect_Array_Size(self.ref)
+            self.elements = []
+            for i in range(0,self.size):
+                self.elements.append(self[i])
+        return self.elements
 
 
 class RSIntArray(RSArray):
@@ -94,24 +107,6 @@ class RSStringArray(RSArray):
         super().__init__(eios=eios, ref=ref, size=size, ra_type=RI_STRING, ctype=ctypes.c_char_p)
 
     def __getitem__(self, key: int = None):
-        # print(f"{self.elements = }")
-        # if not self.elements:
         element = self.eios._Reflect_Array_Index(self.ref, self.ra_type, key, 1)
         length = ctypes.cast(element, ctypes.POINTER(ctypes.c_int32)).contents.value
-        pi = ctypes.cast(element, ctypes.POINTER(self.ctype))
-        return ctypes.string_at(element,length+4)[4:].decode("utf8")
-            # pi = ctypes.cast(element, ctypes.POINTER(self.ctype))
-            # print(f"{pi = }")
-            # print(f"{pi.contents = }")                                                                                           
-            # print(f"{ctypes.string_at(pi) = }")
-            # s = self.eios._Reflect_String(elem)
-            # print("s=",s )
-            # b.value = element
-            # print("b.value=",b.value )
-            # print("c=",c )
-            # c = b.from_address(element)
-            # print("b=",b )
-        #     # print(f"{element = } , {pi = }, {pi.contents.value = }")
-        #     return pi.contents.value
-        # else:
-        #     return self.elements[key]
+        return strip_tags(ctypes.string_at(element,length+4)[4:].replace(b"\xc2\xa0", b" ").decode("utf8"))
