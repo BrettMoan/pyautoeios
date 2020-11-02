@@ -44,6 +44,18 @@ class RSLocalPlayer(RSPlayer):
         # 'TOTALLEVEL' : 23, # broken, returns a 1.
     }
 
+    # def __init__(self, eios: EIOS = None, ref=None):
+    #     super().__init__(eios, ref)
+    #     self._currentlevels = None
+    #     self._reallevels = None
+    #     self._experiences = None
+    # def __del__(self):
+    #     del self._currentlevels
+    #     del self._reallevels
+    #     del self._experiences
+    #     super().__del__()
+    # def _get_skills_array()
+
     def _get_skill_int(self, skill_name: str, hook: hooks.THook) -> int:
         index = self.SKILL_KEYS[skill_name]
         _ref = self.eios._Reflect_Array(None, hook)

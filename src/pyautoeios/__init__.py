@@ -41,4 +41,4 @@ def pair_client(eios_obj: eios.EIOS):
 
 
 __AUTHOR__ = "brett.moan@gmail.com"
-__VERSION__ = "0.0.4"
+__VERSION__ = "0.0.5"

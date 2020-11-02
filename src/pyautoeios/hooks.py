@@ -2,8 +2,10 @@ import collections
 
 THook = collections.namedtuple("THook", "cls field desc multiplier")
 
+
 def hook(c: str, f: str, d: str, m: int):
     return THook(c.encode("utf8"), f.encode("utf8"), d.encode("utf8"), m)
+
 
 NODE_UID = hook("gn", "cm", "J", 1)
 NODE_PREV = hook("gn", "ct", "Lgn;", 1)

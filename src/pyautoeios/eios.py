@@ -193,18 +193,14 @@ class EIOS:
     _stdcall.EIOS_RequestTarget.restype = EIOSPtr
 
     def _EIOS_RequestTarget(self, initstr: str) -> EIOSPtr:
-        """
-        EIOS* EIOS_RequestTarget(const char* initargs) noexcept;
-        """
+        """EIOS* EIOS_RequestTarget(const char* initargs) noexcept;"""
         return self._stdcall.EIOS_RequestTarget(bytes(initstr, encoding="utf8"))
 
     _stdcall.EIOS_ReleaseTarget.argtypes = [EIOSPtr]
     _stdcall.EIOS_ReleaseTarget.restype = None
 
     def _EIOS_ReleaseTarget(self) -> None:
-        """
-        void EIOS_ReleaseTarget(EIOS* eios) noexcept;
-        """
+        """void EIOS_ReleaseTarget(EIOS* eios) noexcept;"""
         self._stdcall.EIOS_ReleaseTarget(self._eios_ptr)
 
     _stdcall.EIOS_GetTargetDimensions.argtypes = [EIOSPtr, IntPtr, IntPtr]
@@ -226,9 +222,7 @@ class EIOS:
     _stdcall.EIOS_GetImageBuffer.restype = ctypes.POINTER(ctypes.c_uint8)
 
     def _EIOS_GetImageBuffer(self):
-        """
-        std::uint8_t* EIOS_GetImageBuffer(EIOS* eios) noexcept;
-        """
+        """std::uint8_t* EIOS_GetImageBuffer(EIOS* eios) noexcept;"""
         buffer = self._stdcall.EIOS_GetImageBuffer(self._eios_ptr)
         return buffer
 
@@ -236,9 +230,7 @@ class EIOS:
     _stdcall.EIOS_GetDebugImageBuffer.restype = ctypes.POINTER(ctypes.c_uint8)
 
     def _EIOS_GetDebugImageBuffer(self):
-        """
-        std::uint8_t* EIOS_GetDebugImageBuffer(EIOS* eios) noexcept;
-        """
+        """std::uint8_t* EIOS_GetDebugImageBuffer(EIOS* eios) noexcept;"""
         buffer = self._stdcall.EIOS_GetDebugImageBuffer(self._eios_ptr)
         return buffer
 
@@ -246,72 +238,56 @@ class EIOS:
     _stdcall.EIOS_SetGraphicsDebugging.restype = None
 
     def _EIOS_SetGraphicsDebugging(self, enabled: bool):
-        """
-        void EIOS_SetGraphicsDebugging(EIOS* eios, bool enabled) noexcept;
-        """
+        """void EIOS_SetGraphicsDebugging(EIOS* eios, bool enabled) noexcept;"""
         self._stdcall.EIOS_SetGraphicsDebugging(self._eios_ptr, enabled)
 
     _stdcall.EIOS_UpdateImageBuffer.argtypes = [EIOSPtr]
     _stdcall.EIOS_UpdateImageBuffer.restype = None
 
     def _EIOS_UpdateImageBuffer(self) -> None:
-        """
-        void EIOS_UpdateImageBuffer(EIOS* eios) noexcept;
-        """
+        """void EIOS_UpdateImageBuffer(EIOS* eios) noexcept;"""
         self._stdcall.EIOS_UpdateImageBuffer(self._eios_ptr)
 
     _stdcall.EIOS_HasFocus.argtypes = [EIOSPtr]
     _stdcall.EIOS_HasFocus.restype = ctypes.c_bool
 
     def _EIOS_HasFocus(self) -> bool:
-        """
-        bool EIOS_HasFocus(EIOS* eios) noexcept;
-        """
+        """bool EIOS_HasFocus(EIOS* eios) noexcept;"""
         return self._stdcall.EIOS_HasFocus(self._eios_ptr)
 
     _stdcall.EIOS_GainFocus.argtypes = [EIOSPtr]
     _stdcall.EIOS_GainFocus.restype = None
 
     def _EIOS_GainFocus(self) -> None:
-        """
-        void EIOS_GainFocus(EIOS* eios) noexcept;
-        """
+        """void EIOS_GainFocus(EIOS* eios) noexcept;"""
         self._stdcall.EIOS_GainFocus(self._eios_ptr)
 
     _stdcall.EIOS_LoseFocus.argtypes = [EIOSPtr]
     _stdcall.EIOS_LoseFocus.restype = None
 
     def _EIOS_LoseFocus(self) -> None:
-        """
-        void EIOS_LoseFocus(EIOS* eios) noexcept;
-        """
+        """void EIOS_LoseFocus(EIOS* eios) noexcept;"""
         self._stdcall.EIOS_LoseFocus(self._eios_ptr)
 
     _stdcall.EIOS_IsInputEnabled.argtypes = [EIOSPtr]
     _stdcall.EIOS_IsInputEnabled.restype = ctypes.c_bool
 
     def _EIOS_IsInputEnabled(self) -> bool:
-        """
-        bool EIOS_IsInputEnabled(EIOS* eios) noexcept;
-        """
+        """bool EIOS_IsInputEnabled(EIOS* eios) noexcept;"""
         return self._stdcall.EIOS_IsInputEnabled(self._eios_ptr)
 
     _stdcall.EIOS_SetInputEnabled.argtypes = [EIOSPtr, ctypes.c_bool]
     _stdcall.EIOS_SetInputEnabled.restype = None
 
     def _EIOS_SetInputEnabled(self, enabled: bool) -> None:
-        """
-        void EIOS_SetInputEnabled(EIOS* eios, bool enabled) noexcept;
-        """
+        """void EIOS_SetInputEnabled(EIOS* eios, bool enabled) noexcept;"""
         self._stdcall.EIOS_SetInputEnabled(self._eios_ptr, enabled)
 
     _stdcall.EIOS_GetMousePosition.argtypes = [EIOSPtr, IntPtr, IntPtr]
     _stdcall.EIOS_GetMousePosition.restype = None
 
     def _EIOS_GetMousePosition(self) -> Tuple[int, int]:
-        """
-        void EIOS_GetMousePosition(EIOS* eios, std::int32_t* x, std::int32_t* y) noexcept;
-        """
+        """void EIOS_GetMousePosition(EIOS* eios, std::int32_t* x, std::int32_t* y) noexcept;"""
         x = ctypes.c_int32()
         y = ctypes.c_int32()
         self._stdcall.EIOS_GetMousePosition(
@@ -323,9 +299,7 @@ class EIOS:
     _stdcall.EIOS_GetRealMousePosition.restype = None
 
     def _EIOS_GetRealMousePosition(self) -> Tuple[int, int]:
-        """
-        void EIOS_GetRealMousePosition(EIOS* eios, std::int32_t* x, std::int32_t* y) noexcept;
-        """
+        """void EIOS_GetRealMousePosition(EIOS* eios, std::int32_t* x, std::int32_t* y) noexcept;"""
         x = ctypes.c_int32()
         y = ctypes.c_int32()
         self._stdcall.EIOS_GetRealMousePosition(
@@ -337,36 +311,28 @@ class EIOS:
     _stdcall.EIOS_MoveMouse.restype = None
 
     def _EIOS_MoveMouse(self, x: int, y: int) -> None:
-        """
-        void EIOS_MoveMouse(EIOS* eios, std::int32_t x, std::int32_t y) noexcept;
-        """
+        """void EIOS_MoveMouse(EIOS* eios, std::int32_t x, std::int32_t y) noexcept;"""
         self._stdcall.EIOS_MoveMouse(self._eios_ptr, x, y)
 
     _stdcall.EIOS_HoldMouse.argtypes = [EIOSPtr, Coordinate, Coordinate, ctypes.c_int32]
     _stdcall.EIOS_HoldMouse.restype = None
 
     def _EIOS_HoldMouse(self, x: int, y: int, button: int) -> None:
-        """
-        void EIOS_HoldMouse(EIOS* eios, std::int32_t x, std::int32_t y, std::int32_t button) noexcept;
-        """
+        """void EIOS_HoldMouse(EIOS* eios, std::int32_t x, std::int32_t y, std::int32_t button) noexcept;"""
         self._stdcall.EIOS_HoldMouse(self._eios_ptr, x, y, button)
 
     _stdcall.EIOS_ReleaseMouse.argtypes = [EIOSPtr, Coordinate, Coordinate, MouseButton]
     _stdcall.EIOS_ReleaseMouse.restype = None
 
     def _EIOS_ReleaseMouse(self, x: int, y: int, button: int) -> None:
-        """
-        void EIOS_ReleaseMouse(EIOS* eios, std::int32_t x, std::int32_t y, std::int32_t button) noexcept;
-        """
+        """void EIOS_ReleaseMouse(EIOS* eios, std::int32_t x, std::int32_t y, std::int32_t button) noexcept;"""
         self._stdcall.EIOS_ReleaseMouse(self._eios_ptr, x, y, button)
 
     _stdcall.EIOS_ScrollMouse.argtypes = [EIOSPtr, Coordinate, Coordinate, MouseButton]
     _stdcall.EIOS_ScrollMouse.restype = None
 
     def _EIOS_ScrollMouse(self, x: int, y: int, lines: int) -> None:
-        """
-        void EIOS_ScrollMouse(EIOS* eios, std::int32_t x, std::int32_t y, std::int32_t lines) noexcept;
-        """
+        """void EIOS_ScrollMouse(EIOS* eios, std::int32_t x, std::int32_t y, std::int32_t lines) noexcept;"""
         self._stdcall.EIOS_ScrollMouse(self._eios_ptr, x, y, lines)
 
     # TODO: EIOS_IsMouseButtonHeld appears to be missing form the DLL???
@@ -376,9 +342,7 @@ class EIOS:
     # _stdcall.EIOS_IsMouseButtonHeld.restype = ctypes.c_bool
 
     # def _EIOS_IsMouseButtonHeld(self, button: int) -> bool:
-    #     """
-    #     bool EIOS_IsMouseButtonHeld(EIOS* eios, std::int32_t button) noexcept;
-    #     """
+    #     """bool EIOS_IsMouseButtonHeld(EIOS* eios, std::int32_t button) noexcept;"""
     #     return self._stdcall.EIOS_IsMouseButtonHeld(self._eios_ptr, button)
 
     _stdcall.EIOS_SendString.argtypes = [
@@ -390,9 +354,7 @@ class EIOS:
     _stdcall.EIOS_SendString.restype = None
 
     def _EIOS_SendString(self, text: str, keywait: int, keymodwait: int) -> None:
-        """
-        void EIOS_SendString(EIOS* eios, const char* string, std::int32_t keywait, std::int32_t keymodwait) noexcept;
-        """
+        """void EIOS_SendString(EIOS* eios, const char* string, std::int32_t keywait, std::int32_t keymodwait) noexcept;"""
         _text = bytes(text, encoding="utf8")
         self._stdcall.EIOS_SendString(self._eios_ptr, _text, keywait, keymodwait)
 
@@ -400,99 +362,77 @@ class EIOS:
     _stdcall.EIOS_HoldKey.restype = None
 
     def _EIOS_HoldKey(self, key: int) -> None:
-        """
-        void EIOS_HoldKey(EIOS* eios, std::int32_t key) noexcept;
-        """
+        """void EIOS_HoldKey(EIOS* eios, std::int32_t key) noexcept;"""
         self._stdcall.EIOS_HoldKey(self._eios_ptr, key)
 
     _stdcall.EIOS_ReleaseKey.argtypes = [EIOSPtr, KeyCode]
     _stdcall.EIOS_ReleaseKey.restype = None
 
     def _EIOS_ReleaseKey(self, key: int) -> None:
-        """
-        void EIOS_ReleaseKey(EIOS* eios, std::int32_t key) noexcept;
-        """
+        """void EIOS_ReleaseKey(EIOS* eios, std::int32_t key) noexcept;"""
         self._stdcall.EIOS_ReleaseKey(self._eios_ptr, key)
 
     _stdcall.EIOS_IsKeyHeld.argtypes = [EIOSPtr, KeyCode]
     _stdcall.EIOS_IsKeyHeld.restype = ctypes.c_bool
 
     def _EIOS_IsKeyHeld(self, key: int) -> bool:
-        """
-        bool EIOS_IsKeyHeld(EIOS* eios, std::int32_t key) noexcept;
-        """
+        """bool EIOS_IsKeyHeld(EIOS* eios, std::int32_t key) noexcept;"""
         return self._stdcall.EIOS_IsKeyHeld(self._eios_ptr, key)
 
     _stdcall.EIOS_GetKeyboardSpeed.argtypes = [EIOSPtr]
     _stdcall.EIOS_GetKeyboardSpeed.restype = ctypes.c_int32
 
     def _EIOS_GetKeyboardSpeed(self) -> int:
-        """
-        std::int32_t EIOS_GetKeyboardSpeed(EIOS* eios) noexcept;
-        """
+        """std::int32_t EIOS_GetKeyboardSpeed(EIOS* eios) noexcept;"""
         return self._stdcall.EIOS_GetKeyboardSpeed(self._eios_ptr)
 
     _stdcall.EIOS_SetKeyboardSpeed.argtypes = [EIOSPtr, ctypes.c_int32]
     _stdcall.EIOS_SetKeyboardSpeed.restype = None
 
     def _EIOS_SetKeyboardSpeed(self, speed: int) -> None:
-        """
-        void EIOS_SetKeyboardSpeed(EIOS* eios, std::int32_t speed) noexcept;
-        """
+        """void EIOS_SetKeyboardSpeed(EIOS* eios, std::int32_t speed) noexcept;"""
         self._stdcall.EIOS_SetKeyboardSpeed(self._eios_ptr, speed)
 
     _stdcall.EIOS_GetKeyboardRepeatDelay.argtypes = [EIOSPtr]
     _stdcall.EIOS_GetKeyboardRepeatDelay.restype = ctypes.c_int32
 
     def _EIOS_GetKeyboardRepeatDelay(self) -> int:
-        """
-        std::int32_t EIOS_GetKeyboardRepeatDelay(EIOS* eios) noexcept;
-        """
+        """std::int32_t EIOS_GetKeyboardRepeatDelay(EIOS* eios) noexcept;"""
         return self._stdcall.EIOS_GetKeyboardRepeatDelay(self._eios_ptr)
 
     _stdcall.EIOS_SetKeyboardRepeatDelay.argtypes = [EIOSPtr, ctypes.c_int32]
     _stdcall.EIOS_SetKeyboardRepeatDelay.restype = None
 
     def _EIOS_SetKeyboardRepeatDelay(self, delay: int) -> None:
-        """
-        void EIOS_SetKeyboardRepeatDelay(EIOS* eios, std::int32_t delay) noexcept;
-        """
+        """void EIOS_SetKeyboardRepeatDelay(EIOS* eios, std::int32_t delay) noexcept;"""
         self._stdcall.EIOS_SetKeyboardRepeatDelay(self._eios_ptr, delay)
 
     _stdcall.EIOS_PairClient.argtypes = [PID]
     _stdcall.EIOS_PairClient.restype = EIOSPtr
 
     def _EIOS_PairClient(self, pid: int) -> EIOSPtr:
-        """
-        EIOS* EIOS_PairClient(pid_t pid) noexcept;
-        """
+        """EIOS* EIOS_PairClient(pid_t pid) noexcept;"""
         return self._stdcall.EIOS_PairClient(pid)
 
     _stdcall.EIOS_KillClientPID.argtypes = [PID]
     _stdcall.EIOS_KillClientPID.restype = None
 
     def _EIOS_KillClientPID(self, pid: int) -> None:
-        """
-        void EIOS_KillClientPID(pid_t pid) noexcept;
-        """
+        """void EIOS_KillClientPID(pid_t pid) noexcept;"""
         self._stdcall.EIOS_KillClientPID(pid)
 
     _stdcall.EIOS_KillClient.argtypes = [EIOSPtr]
     _stdcall.EIOS_KillClient.restype = None
 
     def _EIOS_KillClient(self) -> None:
-        """
-        void EIOS_KillClient(EIOS* eios) noexcept;
-        """
+        """void EIOS_KillClient(EIOS* eios) noexcept;"""
         self._stdcall.EIOS_KillClient(self._eios_ptr)
 
     _stdcall.EIOS_KillZombieClients.argtypes = []
     _stdcall.EIOS_KillZombieClients.restype = None
 
     def _EIOS_KillZombieClients(self) -> None:
-        """
-        void EIOS_KillZombieClients() noexcept;
-        """
+        """void EIOS_KillZombieClients() noexcept;"""
         self._stdcall.EIOS_KillZombieClients(self._eios_ptr)
 
     _stdcall.EIOS_GetClients.argtypes = [ctypes.c_bool]
@@ -514,348 +454,169 @@ class EIOS:
     _stdcall.EIOS_GetClientPID.restype = PID
 
     def _EIOS_GetClientPID(self, index: int) -> int:
-        """
-        pid_t EIOS_GetClientPID(std::size_t index) noexcept;
-        """
+        """pid_t EIOS_GetClientPID(std::size_t index) noexcept;"""
         return self._stdcall.EIOS_GetClientPID(index)
 
     _cdecl.EIOS_Inject.argtypes = [ctypes.c_char_p]
     _cdecl.EIOS_Inject.restype = None
 
     def _EIOS_Inject(self, process_name: str = "JagexLauncher.exe") -> None:
-        """
-        void EIOS_Inject(const char* process_name) noexcept;
-        """
+        """void EIOS_Inject(const char* process_name) noexcept;"""
         self._cdecl.EIOS_Inject(process_name.encode("utf8"))
 
     _cdecl.EIOS_Inject_PID.argtypes = [PID]
     _cdecl.EIOS_Inject_PID.restype = None
 
     def _EIOS_Inject_PID(self, pid: int) -> None:
-        """
-        void EIOS_Inject_PID(std::int32_t pid) noexcept;
-        """
+        """void EIOS_Inject_PID(std::int32_t pid) noexcept;"""
         self._cdecl.EIOS_Inject_PID(pid)
 
     _cdecl.Reflect_GetEIOS.argtypes = [PID]
     _cdecl.Reflect_GetEIOS.restype = EIOSPtr
 
     def _Reflect_GetEIOS(self, pid: int) -> EIOSPtr:
-        """
-        EIOS* Reflect_GetEIOS(std::int32_t pid) noexcept;
-        """
+        """EIOS* Reflect_GetEIOS(std::int32_t pid) noexcept;"""
         return self._stdcall.Reflect_GetEIOS(pid)
 
-    _stdcall.Reflect_Object.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+    _stdcall.Reflect_Object.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Object.restype = JObject
 
     def _Reflect_Object(self, jobject: JObject, hook: THook):
-        """
-        jobject Reflect_Object(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        return self._stdcall.Reflect_Object(
-            self._eios_ptr,
-            jobject,
-            hook.cls,
-            hook.field,
-            hook.desc,
-        )
+        """jobject Reflect_Object(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        return self._stdcall.Reflect_Object(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
 
     # def _Reflect_IsSame_Object(self, jobject first, jobject second):
-    #     """
-    #     jboolean Reflect_IsSame_Object(EIOS* eios, jobject first, jobject second) noexcept;
-    #     """
+    #     """jboolean Reflect_IsSame_Object(EIOS* eios, jobject first, jobject second) noexcept;"""
     #     pass
 
     # def _Reflect_InstanceOf(self, jobject:JObject, const char* cls):
-    #     """
-    #     jboolean Reflect_InstanceOf(EIOS* eios, jobject object, const char* cls) noexcept;
-    #     """
+    #     """jboolean Reflect_InstanceOf(EIOS* eios, jobject object, const char* cls) noexcept;"""
     #     pass
 
     _stdcall.Reflect_Release_Object.argtypes = [EIOSPtr, JObject]
     _stdcall.Reflect_Release_Object.restype = None
 
     def _Reflect_Release_Object(self, jobject: JObject):
-        """
-        void Reflect_Release_Object(EIOS* eios, jobject object) noexcept;
-        """
+        """void Reflect_Release_Object(EIOS* eios, jobject object) noexcept;"""
         self._stdcall.Reflect_Release_Object(self._eios_ptr, jobject)
 
     # def _Reflect_Release_Objects(self, jobject* objects, std::size_t amount):
-    #     """
-    #     void Reflect_Release_Objects(EIOS* eios, jobject* objects, std::size_t amount) noexcept;
-    #     """
+    #     """void Reflect_Release_Objects(EIOS* eios, jobject* objects, std::size_t amount) noexcept;"""
     #     pass
 
-    _stdcall.Reflect_Bool.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+    _stdcall.Reflect_Bool.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Bool.restype = ctypes.c_bool
 
     def _Reflect_Bool(self, jobject: JObject, hook: THook) -> bool:
-        """
-        bool Reflect_Bool(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        return self._stdcall.Reflect_Bool(
-            self._eios_ptr,
-            jobject,
-            hook.cls,
-            hook.field,
-            hook.desc,
-        )
+        """bool Reflect_Bool(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        return self._stdcall.Reflect_Bool(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
 
-    _stdcall.Reflect_Char.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+    _stdcall.Reflect_Char.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Char.restype = ctypes.c_char
 
     def _Reflect_Char(self, jobject: JObject, hook: THook) -> bytes:
-        """
-        char Reflect_Char(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        return self._stdcall.Reflect_Char(
-            self._eios_ptr,
-            jobject,
-            hook.cls,
-            hook.field,
-            hook.desc,
-        )
-
-    _stdcall.Reflect_Byte.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+        """char Reflect_Char(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        return self._stdcall.Reflect_Char(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
+    _stdcall.Reflect_Byte.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Byte.restype = ctypes.c_int8
 
     def _Reflect_Byte(self, jobject: JObject, hook: THook) -> int:
-        """
-        std::uint8_t Reflect_Byte(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        value = (
-            self._stdcall.Reflect_Byte(
-                self._eios_ptr,
-                jobject,
-                hook.cls,
-                hook.field,
-                hook.desc,
-            )
-            * hook.multiplier
-        )
-        return (value + 2 ** 7) % 2 ** 8 - 2 ** 7
+        """std::uint8_t Reflect_Byte(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        value = self._stdcall.Reflect_Byte(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
+        return ((value * hook.multiplier) + 2 ** 7) % 2 ** 8 - 2 ** 7
 
-    _stdcall.Reflect_Short.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+    _stdcall.Reflect_Short.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Short.restype = ctypes.c_int16
 
     def _Reflect_Short(self, jobject: JObject, hook: THook) -> int:
-        """
-        std::int16_t Reflect_Short(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        value = (
-            self._stdcall.Reflect_Short(
-                self._eios_ptr,
-                jobject,
-                hook.cls,
-                hook.field,
-                hook.desc,
-            )
-            * hook.multiplier
-        )
-        return (value + 2 ** 15) % 2 ** 16 - 2 ** 15
+        """std::int16_t Reflect_Short(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        value = self._stdcall.Reflect_Short(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
+        return ((value * hook.multiplier) + 2 ** 15) % 2 ** 16 - 2 ** 15
 
-    _stdcall.Reflect_Int.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+    _stdcall.Reflect_Int.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Int.restype = ctypes.c_int32
 
     def _Reflect_Int(self, jobject: JObject, hook: THook) -> int:
-        """
-        std::int32_t Reflect_Int(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        value = (
-            self._stdcall.Reflect_Int(
-                self._eios_ptr,
-                jobject,
-                hook.cls,
-                hook.field,
-                hook.desc,
-            )
-            * hook.multiplier
-        )
-        return (value + 2 ** 31) % 2 ** 32 - 2 ** 31
+        """std::int32_t Reflect_Int(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        value = self._stdcall.Reflect_Int(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
+        return ((value * hook.multiplier) + 2 ** 31) % 2 ** 32 - 2 ** 31
 
-    _stdcall.Reflect_Long.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+    _stdcall.Reflect_Long.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Long.restype = ctypes.c_int64
 
     def _Reflect_Long(self, jobject: JObject, hook: THook) -> int:
-        """
-        std::int64_t Reflect_Long(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        value = (
-            self._stdcall.Reflect_Long(
-                self._eios_ptr,
-                jobject,
-                hook.cls,
-                hook.field,
-                hook.desc,
-            )
-            * hook.multiplier
-        )
-        return (value + 2 ** 63) % 2 ** 64 - 2 ** 63
+        """std::int64_t Reflect_Long(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        value = self._stdcall.Reflect_Long(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
+        return ((value * hook.multiplier) + 2 ** 63) % 2 ** 64 - 2 ** 63
 
     # def _Reflect_Float(self, jobject:JObject, hook:THook) -> float:
-    #     """
-    #     float Reflect_Float(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
+    #     """float Reflect_Float(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
     #     pass
 
     # def _Reflect_Double(self, jobject:JObject, hook:THook) -> float:
-    #     """
-    #     double Reflect_Double(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
+    #     """double Reflect_Double(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
     #     pass
 
-    _stdcall.Reflect_String.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_size_t,
-    ]
+    _stdcall.Reflect_String.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_size_t]
     _stdcall.Reflect_String.restype = None
 
     def _Reflect_String(self, jobject: JObject, hook: THook, max_size=100):
-        """
-        void Reflect_String(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc, char* output, std::size_t output_size) noexcept;
-        """
+        """void Reflect_String(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc, char* output, std::size_t output_size) noexcept;"""
         output = ctypes.create_string_buffer(max_size)
-        self._stdcall.Reflect_String(
-            self._eios_ptr,
-            jobject,
-            hook.cls,
-            hook.field,
-            hook.desc,
-            output,
-            max_size,
-        )
+        self._stdcall.Reflect_String(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc, output, max_size)
         return output.value
 
-    _stdcall.Reflect_Array.argtypes = [
-        EIOSPtr,
-        JObject,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-        ctypes.c_char_p,
-    ]
+    _stdcall.Reflect_Array.argtypes = [EIOSPtr, JObject, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     _stdcall.Reflect_Array.restype = JObject
 
     def _Reflect_Array(self, jobject: JObject, hook: THook):
-        """
-        jarray Reflect_Array(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;
-        """
-        return self._stdcall.Reflect_Array(
-            self._eios_ptr,
-            jobject,
-            hook.cls,
-            hook.field,
-            hook.desc,
-        )
+        """jarray Reflect_Array(EIOS* eios, jobject object, const char* cls, const char* field, const char* desc) noexcept;"""
+        return self._stdcall.Reflect_Array(self._eios_ptr, jobject, hook.cls, hook.field, hook.desc)
 
-    # def _Reflect_Array_With_Size(self, jobject:JObject, std::size_t* output_size, hook:THook):
-    #     """
-    #     jarray Reflect_Array_With_Size(EIOS* eios, jobject object, std::size_t* output_size, const char* cls, const char* field, const char* desc) noexcept;
-    #     """
-    #     pass
+    _stdcall.Reflect_Array_With_Size.argtypes = [EIOSPtr,JObject,IntPtr,ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
+    _stdcall.Reflect_Array_With_Size.restype = JObject
+
+    def _Reflect_Array_With_Size(self, jobject: JObject, hook: THook):
+        """jarray Reflect_Array_With_Size(EIOS* eios, jobject object, std::size_t* output_size, const char* cls, const char* field, const char* desc) noexcept;"""
+        size = ctypes.c_int32()
+        _ref = self._stdcall.Reflect_Array_With_Size(self._eios_ptr, jobject, ctypes.byref(size), hook.cls, hook.field, hook.desc)
+        return (_ref, size.value)
 
     _stdcall.Reflect_Array_Size.argtypes = [EIOSPtr, JArray]
     _stdcall.Reflect_Array_Size.restype = ctypes.c_size_t
 
     def _Reflect_Array_Size(self, jarray: JArray):
-        """
-        std::size_t Reflect_Array_Size(EIOS* eios, jarray array) noexcept;
-        """
+        """std::size_t Reflect_Array_Size(EIOS* eios, jarray array) noexcept;"""
         return self._stdcall.Reflect_Array_Size(self._eios_ptr, jarray)
 
-    _stdcall.Reflect_Array_Index.argtypes = [
-        EIOSPtr,
-        JArray,
-        ctypes.c_uint,
-        ctypes.c_size_t,
-        ctypes.c_size_t,
-    ]
-    _stdcall.Reflect_Array_Index.restype = ctypes.c_void_p
+    _cdecl.Reflect_Array_Index.argtypes = [EIOSPtr, JArray, ctypes.c_uint, ctypes.c_size_t, ctypes.c_size_t]
+    _cdecl.Reflect_Array_Index.restype = ctypes.c_void_p
 
-    def _Reflect_Array_Index(
-        self,
-        jarray: JArray,
-        data_type: int,
-        index: ctypes.c_size_t,
-        length: ctypes.c_size_t,
-    ):
-        """
-        void* Reflect_Array_Index(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t index, std::size_t length) noexcept;
-        """
-        return self._stdcall.Reflect_Array_Index(
-            self._eios_ptr, jarray, data_type, index, length
-        )
+    def _Reflect_Array_Index(self, jarray: JArray, data_type: int, index: int, length: int):
+        """void* Reflect_Array_Index(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t index, std::size_t length) noexcept;"""
+        return self._cdecl.Reflect_Array_Index(self._eios_ptr, jarray, data_type, index, length)
+
+
+    # _stdcall.Pascal_Reflect_Array_Index.argtypes = [EIOSPtr, JArray, ctypes.c_uint, ctypes.c_size_t, ctypes.c_size_t]
+    # _stdcall.Pascal_Reflect_Array_Index.restype = ctypes.c_void_p
+    # def _Pascal_Reflect_Array_Index(self, jarray: JArray, data_type: int, index: int, length: int):
+    #     return self._stdcall.Pascal_Reflect_Array_Index(self._eios_ptr, jarray, data_type, index, length)
+
 
     # def _Reflect_Array_Index2D(self, jarray:JArray, data_type:int, std::size_t length, std::int32_t x, std::int32_t y):
-    #     """
-    #     void* Reflect_Array_Index2D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y) noexcept;
-    #     """
+    #     """void* Reflect_Array_Index2D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y) noexcept;"""
     #     pass
 
     # def _Reflect_Array_Index3D(self, jarray:JArray, data_type:int, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z):
-    #     """
-    #     void* Reflect_Array_Index3D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z) noexcept;
-    #     """
+    #     """void* Reflect_Array_Index3D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z) noexcept;"""
     #     pass
 
     # def _Reflect_Array_Index4D(self, jarray:JArray, data_type:int, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z, std::int32_t w):
-    #     """
-    #     void* Reflect_Array_Index4D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z, std::int32_t w) noexcept;
-    #     """
+    #     """void* Reflect_Array_Index4D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z, std::int32_t w) noexcept;"""
     #     pass
 
     # def _Reflect_Array_Indices(self, jarray:JArray, data_type:int, std::int32_t* indices, std::size_t length):
-    #     """
-    #     void* Reflect_Array_Indices(EIOS* eios, jarray array, ReflectionArrayType type, std::int32_t* indices, std::size_t length) noexcept;
-    #     """
+    #     """void* Reflect_Array_Indices(EIOS* eios, jarray array, ReflectionArrayType type, std::int32_t* indices, std::size_t length) noexcept;"""
     #     pass
 
     ## PUBLIC FUNCTIONS, to match pythonic naming convention.
