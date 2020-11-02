@@ -13,8 +13,8 @@ rs_client = RSClient(client, None)
 from pyautoeios.rs_client import RSClient
 menu_options = rs_client.menu_options()
 menu_actions = rs_client.menu_actions()
-print(f"{menu_options.size = }")
+print(f"{len(menu_options) = }")
 # print all the menu actions
-print(menu_actions.all())
-print(menu_options.all())
-# print([" ".join(item).strip() for item in zip(menu_actions.all(), menu_options.all()) if item[0] or item[1]])
+joined_and_filtered = [" ".join(item).strip() for item in zip(menu_actions, menu_options) if item[0] or item[1]]
+print(f"{len(joined_and_filtered) = } ")
+print(joined_and_filtered)

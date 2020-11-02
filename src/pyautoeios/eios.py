@@ -73,9 +73,7 @@ TODO:
 import ctypes
 from enum import Enum
 import platform
-from typing import Tuple
-
-import psutil
+from typing import Tuple, List
 
 try:
     from importlib.resources import files
@@ -86,6 +84,8 @@ except ImportError:
     import pathlib
 
     _LIB_DIR = pathlib.Path(pkg_resources.resource_filename(__package__, "lib"))
+
+import psutil
 
 from pyautoeios.hooks import THook
 
@@ -206,7 +206,7 @@ class EIOS:
     _stdcall.EIOS_GetTargetDimensions.argtypes = [EIOSPtr, IntPtr, IntPtr]
     _stdcall.EIOS_GetTargetDimensions.restype = None
 
-    def _EIOS_GetTargetDimensions(self):
+    def _EIOS_GetTargetDimensions(self) -> Tuple[int,int]:
         """
         void EIOS_GetTargetDimensions(EIOS* eios, std::int32_t* width, std::int32_t* height) noexcept;
         :return: width, height
@@ -216,7 +216,7 @@ class EIOS:
         self._stdcall.EIOS_GetTargetDimensions(
             self._eios_ptr, ctypes.byref(width), ctypes.byref(height)
         )
-        return [width.value, height.value]
+        return (width.value, height.value)
 
     _stdcall.EIOS_GetImageBuffer.argtypes = [EIOSPtr]
     _stdcall.EIOS_GetImageBuffer.restype = ctypes.POINTER(ctypes.c_uint8)
@@ -589,12 +589,12 @@ class EIOS:
         """std::size_t Reflect_Array_Size(EIOS* eios, jarray array) noexcept;"""
         return self._stdcall.Reflect_Array_Size(self._eios_ptr, jarray)
 
-    _cdecl.Reflect_Array_Index.argtypes = [EIOSPtr, JArray, ctypes.c_uint, ctypes.c_size_t, ctypes.c_size_t]
-    _cdecl.Reflect_Array_Index.restype = ctypes.c_void_p
+    _stdcall.Reflect_Array_Index.argtypes = [EIOSPtr, JArray, ctypes.c_uint, ctypes.c_size_t, ctypes.c_size_t]
+    _stdcall.Reflect_Array_Index.restype = ctypes.c_void_p
 
     def _Reflect_Array_Index(self, jarray: JArray, data_type: int, index: int, length: int):
         """void* Reflect_Array_Index(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t index, std::size_t length) noexcept;"""
-        return self._cdecl.Reflect_Array_Index(self._eios_ptr, jarray, data_type, index, length)
+        return self._stdcall.Reflect_Array_Index(self._eios_ptr, jarray, data_type, index, length)
 
 
     # _stdcall.Pascal_Reflect_Array_Index.argtypes = [EIOSPtr, JArray, ctypes.c_uint, ctypes.c_size_t, ctypes.c_size_t]
@@ -615,9 +615,16 @@ class EIOS:
     #     """void* Reflect_Array_Index4D(EIOS* eios, jarray array, ReflectionArrayType type, std::size_t length, std::int32_t x, std::int32_t y, std::int32_t z, std::int32_t w) noexcept;"""
     #     pass
 
-    # def _Reflect_Array_Indices(self, jarray:JArray, data_type:int, std::int32_t* indices, std::size_t length):
-    #     """void* Reflect_Array_Indices(EIOS* eios, jarray array, ReflectionArrayType type, std::int32_t* indices, std::size_t length) noexcept;"""
-    #     pass
+
+    _stdcall.Reflect_Array_Indices.argtypes = [EIOSPtr, JArray, ctypes.c_uint, IntPtr, ctypes.c_size_t]
+    _stdcall.Reflect_Array_Indices.restype = ctypes.c_void_p
+
+
+    def _Reflect_Array_Indices(self, jarray:JArray, data_type:int, indices: List[int]):
+        """void* Reflect_Array_Indices(EIOS* eios, jarray array, ReflectionArrayType type, std::int32_t* indices, std::size_t length) noexcept;"""
+        c_array_type = ctypes.c_int * len(indices)
+        c_array = c_array_type(*indices)
+        return self._stdcall.Reflect_Array_Indices(self._eios_ptr, jarray, data_type, c_array, len(indices))
 
     ## PUBLIC FUNCTIONS, to match pythonic naming convention.
     request_target = _EIOS_RequestTarget
