@@ -1,10 +1,10 @@
-
 from pyautoeios.rs_structures import RSType
 from pyautoeios import hooks
 
 from pyautoeios.rs_tile import RSTile
 from pyautoeios.rs_client import RSClient
 from pyautoeios.rs_animation_sequence import RSAnimationSequence
+
 
 class RSAnimableNode(RSType):
     def id(self) -> int:
@@ -38,7 +38,7 @@ class RSAnimableNode(RSType):
         x = self.local_x()
         y = self.local_y()
         return RSTile(self.eios, x, y)
-        
+
     def tile(self) -> RSTile:
         client = RSClient(self.eios, None)
         x = client.base_x() + self.eios._Reflect_Int(self.ref, hooks.ANIMABLENODE_X)

@@ -1,12 +1,12 @@
-
 from pyscreeze import Point
 
 from pyautoeios import hooks
 from pyautoeios import static
 from pyautoeios.rs_structures import RSType
 
+
 class RSActor(RSType):
-    def spoken_text(self) -> str:        
+    def spoken_text(self) -> str:
         return self.eios._Reflect_String(self.ref, hooks.ACTOR_SPOKENTEXT)
 
     def orientation(self) -> int:
@@ -24,7 +24,7 @@ class RSActor(RSType):
     def tile(self) -> Point:
         x = static.base_x(self.eios) + self.local_x() % 128
         y = static.base_y(self.eios) + self.local_y() % 128
-        return Point(x,y)
+        return Point(x, y)
 
     def animation_id(self) -> int:
         return self.eios._Reflect_Int(self.ref, hooks.ACTOR_ANIMATION)

@@ -1,5 +1,7 @@
-from typing import Type
-
+# annotations delays checking of type annotation in pytthon 3.7->3.9
+# this will become the default in python 3.10
+# see this thread: https://stackoverflow.com/a/33533514/4188287
+from __future__ import annotations
 
 from pyautoeios import hooks
 from pyautoeios.eios import EIOS
@@ -9,12 +11,11 @@ from pyautoeios.rs_structures import RSType, RSIntArray
 from pyautoeios.rs_animated_model import RSAnimatedModel
 from pyautoeios.rs_player_definition import RSPlayerDefinition
 
-
-L = Type('RSLocalPlayer')
-
 class RSPlayer(RSType):
-    def me(self) -> L:
-        return RSLocalPlayer(self.eios, self.eios._Reflect_Object(None, hooks.CLIENT_LOCALPLAYER))
+    def me(self) -> RSLocalPlayer:
+        return RSLocalPlayer(
+            self.eios, self.eios._Reflect_Object(None, hooks.CLIENT_LOCALPLAYER)
+        )
 
     def name(self) -> str:
         _ref = self.eios._Reflect_Object(self.ref, hooks.PLAYER_NAME)
@@ -23,7 +24,9 @@ class RSPlayer(RSType):
         return name
 
     def all_players(self):
-        raise NotImplementedError("moved to RSClient in python verison, to prevent circular imports")
+        raise NotImplementedError(
+            "moved to RSClient in python verison, to prevent circular imports"
+        )
 
     def is_visible(self) -> bool:
         return self.eios._Reflect_Bool(self.ref, hooks.PLAYER_VISIBLE)
@@ -40,19 +43,24 @@ class RSPlayer(RSType):
 
     def is_moving(self) -> bool:
         return self.eios._Reflect_Int(self.ref, hooks.ACTOR_QUEUESIZE) > 0
-    
+
     def model(self) -> RSModel:
         raise NotImplementedError
 
     def animated_model(self) -> RSAnimatedModel:
         raise NotImplementedError
 
+
 class RSNameInfo(RSType):
     def name(self):
-        return self.eios._Reflect_String(self.ref, hooks.NAMEINFO_NAME).replace(b"\xc2\xa0", b" ")  # replace nbsp with space
+        return self.eios._Reflect_String(self.ref, hooks.NAMEINFO_NAME).replace(
+            "\xc2\xa0", " "
+        )  # replace nbsp with space
 
     def decoded_name(self):
-        return self.eios._Reflect_String(self.ref, hooks.NAMEINFO_DECODEDNAME).replace(b"\xc2\xa0", b" ")  # replace nbsp with space
+        return self.eios._Reflect_String(self.ref, hooks.NAMEINFO_DECODEDNAME).replace(
+            "\xc2\xa0", " "
+        )  # replace nbsp with space
 
 
 class RSLocalPlayer(RSPlayer):
@@ -80,23 +88,13 @@ class RSLocalPlayer(RSPlayer):
         "RUNECRAFT": 20,
         "HUNTER": 21,
         "CONSTRUCTION": 22,
-        # 'TOTALLEVEL' : 23, # broken, returns a 1.
+        # 'TOTALLEVEL' : 23, # TODO: broken, returns a 1.
     }
 
-    # def __init__(self, eios: EIOS = None, ref=None):
-    #     super().__init__(eios, ref)
-    #     self._currentlevels = None
-    #     self._reallevels = None
-    #     self._experiences = None
-    # def __del__(self):
-    #     del self._currentlevels
-    #     del self._reallevels
-    #     del self._experiences
-    #     super().__del__()
-    # def _get_skills_array()
-
     def index(self) -> int:
-        return (self.eios._Reflect_Int(None, hooks.CLIENT_PLAYERINDEX) + 2 ** 15) % 2 ** 16 - 2 ** 15
+        return (
+            self.eios._Reflect_Int(None, hooks.CLIENT_PLAYERINDEX) + 2 ** 15
+        ) % 2 ** 16 - 2 ** 15
 
     def _get_skill_int(self, skill_name: str, hook: hooks.THook) -> int:
         index = self.SKILL_KEYS[skill_name]
@@ -113,17 +111,15 @@ class RSLocalPlayer(RSPlayer):
     def experience(self, skill_name: str) -> int:
         return self._get_skill_int(skill_name, hooks.CLIENT_EXPERIENCES)
 
-    def CurrentWorld(self) -> int:
+    def current_world(self) -> int:
         return self.eios._Reflect_Int(None, hooks.CLIENT_CURRENTWORLD)
 
-    def RunEnergy(self) -> int:
+    def run_energy(self) -> int:
         return self.eios._Reflect_Int(None, hooks.CLIENT_ENERGY)
 
-    def Weight(self) -> int:
+    def weight(self) -> int:
         return self.eios._Reflect_Int(None, hooks.CLIENT_WEIGHT)
 
 
-
-
-def me(eios: EIOS):
+def me(eios: EIOS) -> RSLocalPlayer:
     return RSLocalPlayer(eios, eios._Reflect_Object(None, hooks.CLIENT_LOCALPLAYER))

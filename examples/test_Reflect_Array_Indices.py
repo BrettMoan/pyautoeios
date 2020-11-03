@@ -44,11 +44,13 @@ rs_client = RSClient(client, None)
 
 npc_array = []
 for npc in rs_client.all_npcs():
-        definition = npc.definition()
-        if definition:
-            npc_array.append({
+    definition = npc.definition()
+    if definition:
+        npc_array.append(
+            {
                 "name": definition.name(),
-                "id" : definition.id(),
-            })
+                "id": definition.id(),
+            }
+        )
 
 print(npc_array)

@@ -1,8 +1,8 @@
-
 from pyautoeios import hooks
 from pyautoeios.rs_queue import RSQueue
 from pyautoeios.rs_structures import RSType
 from pyautoeios.rs_iterable_hash_table import RSIterableHashTable
+
 
 class RSCache(RSType):
     def hash_table(self) -> RSIterableHashTable:

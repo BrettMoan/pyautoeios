@@ -26,7 +26,7 @@ print([i for i in indices if i])
 
 # is_menu_open = rs_client.is_menu_open()
 # print(f"{is_menu_open = }")
-# if is_menu_open: 
+# if is_menu_open:
 #     menu_bounds = rs_client.menu_bounds()
 #     print(f"{menu_bounds = }")
 

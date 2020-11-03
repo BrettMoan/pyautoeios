@@ -1,6 +1,6 @@
-
 from pyautoeios import hooks
 from pyautoeios.rs_structures import RSType
+
 
 class RSAnimatedModel(RSType):
     def triangle_faces(self):

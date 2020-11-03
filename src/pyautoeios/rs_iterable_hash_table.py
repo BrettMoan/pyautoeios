@@ -4,6 +4,7 @@ from pyautoeios import hooks
 from pyautoeios.rs_node import RSNode
 from pyautoeios.rs_structures import RSType
 
+
 class RSIterableHashTable(RSType):
     def head(self) -> RSNode:
         _ref = self.eios._Reflect_Object(self.ref, hooks.ITERABLEHASHTABLE_HEAD)
@@ -60,7 +61,7 @@ class RSIterableHashTable(RSType):
         # if Head.ref <> nil then
         #     Current := Head.Next;
         #     if Current.ref <> nil then
-    
+
         #         while HeadUID <> (CurrentUID := Current.UID) do
         #             if CurrentUID = ID then
         #                 Exit(Current);

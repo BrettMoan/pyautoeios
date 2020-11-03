@@ -1,4 +1,3 @@
-
 from pyautoeios.rs_structures import RSType
 from pyautoeios import hooks
 from pyautoeios.rs_node import RSNode
