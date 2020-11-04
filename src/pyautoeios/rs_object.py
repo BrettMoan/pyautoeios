@@ -17,7 +17,6 @@ from pyautoeios.rs_model import RSModel
 from pyautoeios.rs_animated_model import RSAnimatedModel
 
 
-
 class RSObjectType(Enum):
     GAME_OBJECT = auto()
     WALL_DECORATION = auto()
@@ -49,16 +48,23 @@ class RSObject(RSType):
         RSObjectType.FLOOR_DECORATION: hooks.FLOORDECORATION_LOCALY,
     }
 
-
     # two refernces on what @overload does and how it works
     #   https://docs.python.org/3/library/typing.html#typing.overload
     #   https://mypy.readthedocs.io/en/stable/more_types.html?highlight=overload#function-overloading
     @overload
-    def get(self, object_type: RSObjectType) -> List[RSObject]: ...
+    def get(self, object_type: RSObjectType) -> List[RSObject]:
+        ...
+
     @overload
-    def get(self, object_type: RSObjectType, x: int, y: int) -> RSObject: ...
-    
-    def get(self, object_type: RSObjectType, x: Optional[int] = None, y: Optional[int] = None) -> Union[RSObject, List[RSObject]]:
+    def get(self, object_type: RSObjectType, x: int, y: int) -> RSObject:
+        ...
+
+    def get(
+        self,
+        object_type: RSObjectType,
+        x: Optional[int] = None,
+        y: Optional[int] = None,
+    ) -> Union[RSObject, List[RSObject]]:
         raise NotImplementedError
 
     def hash(self) -> int:
@@ -72,7 +78,7 @@ class RSObject(RSType):
            Result := (self.Hash shr 17) and $FFFFFFFF;
         and $FFFFFFFF might vary by the architecture (32 vs 64 bit)
         """
-        raise (self.hash() >> 17) & (2**32 -1) 
+        raise static.shr(self.hash(), 17) & (2 ** 32 - 1)
 
     def local_tile(self) -> RSTile:
         x = self.eios._Reflect_Int(self.ref, self.x_hooks[self.object_type])

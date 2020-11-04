@@ -11,6 +11,7 @@ from pyautoeios.rs_structures import RSType, RSIntArray
 from pyautoeios.rs_animated_model import RSAnimatedModel
 from pyautoeios.rs_player_definition import RSPlayerDefinition
 
+
 class RSPlayer(RSType):
     def me(self) -> RSLocalPlayer:
         return RSLocalPlayer(

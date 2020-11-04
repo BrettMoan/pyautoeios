@@ -138,10 +138,18 @@ class RSClient(RSType):
         raise NotImplementedError
 
     def menu_actions(self) -> List[str]:
-        return get_rs_string_array(self.eios, ref=None, hook=hooks.CLIENT_MENUACTIONS)
+        return get_rs_string_array(
+            eios=self.eios,
+            ref=None,
+            hook=hooks.CLIENT_MENUACTIONS,
+        )
 
     def menu_options(self) -> List[str]:
-        return get_rs_string_array(self.eios, ref=None, hook=hooks.CLIENT_MENUOPTIONS)
+        return get_rs_string_array(
+            eios=self.eios,
+            ref=None,
+            hook=hooks.CLIENT_MENUOPTIONS,
+        )
 
     def menu_count(self) -> int:
         return self.eios._Reflect_Int(None, hooks.CLIENT_MENUCOUNT)

@@ -23,3 +23,9 @@ def base_x(eios: EIOS) -> int:
 
 def base_y(eios: EIOS) -> int:
     return eios._Reflect_Int(None, hooks.CLIENT_BASEY)
+
+def shr(x:int, y:int) -> int:
+    return x >> y
+
+def shl(x:int, y:int) -> int:
+    return x << y

@@ -14,7 +14,6 @@ from pyautoeios.rs_model import RSModel
 from pyautoeios.rs_animated_model import RSAnimatedModel
 
 
-
 class RSObjectType(Enum):
     GAME_OBJECT = auto()
     WALL_DECORATION = auto()
@@ -78,10 +77,14 @@ class RSObjectDefinition(RSType):
         raise NotImplementedError
 
     def transform_varbit(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARBIT)
+        return self.eios._Reflect_Int(
+            self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARBIT
+        )
 
     def transform_varp(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARP)
+        return self.eios._Reflect_Int(
+            self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARP
+        )
 
     def transform(self) -> RSObjectDefinition:
         raise NotImplementedError

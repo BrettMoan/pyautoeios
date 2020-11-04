@@ -18,7 +18,7 @@ class RSTile(RSType):
         super().__init__(eios=eios, ref=None)
 
     def region_id(self) -> int:
-        return ((self.x >> 6) << 8) or (self.y >> 6)
+        return static.shl(static.shr(self.x, 6), 8) or (self.y >> 6)
 
     def to_local(self) -> RSTile:
         x = ((self.x - static.base_x(self.eios)) << 7) + (1 << 6)

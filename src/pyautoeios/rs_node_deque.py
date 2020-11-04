@@ -2,6 +2,7 @@ from pyautoeios import hooks
 from pyautoeios.rs_node import RSNode
 from pyautoeios.rs_structures import RSType
 
+
 class RSNodeDeque(RSType):
     def head(self) -> RSNode:
         _ref = self.eios._Reflect_Object(self.ref, hooks.NODEDEQUE_HEAD)
