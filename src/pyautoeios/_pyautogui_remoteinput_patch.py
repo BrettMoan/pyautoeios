@@ -1,20 +1,40 @@
-""" This module integrates remoteinput's EIOS methods with pyautogui.
-
-EIOS implementation to interact with PyAutoGUI functions.
-Copyright (c) 2020, Brett Moan <brett.moan@gmail.com>
-"""
+""" This module integrates remoteinput's EIOS methods with pyautogui."""
 
 __license__ = """
-In order to integrate with the pacakge pyautogui, some of the functions are derived from _pyautogui_win.py at 
-https://github.com/asweigart/pyautogui/blob/6bfa7a23b8ccba80d3211a473d7c496ff869d3a2/pyautogui/_pyautogui_win.py
+Copyright 2020 by Brett J. Moan
 
-Therefore, this file is under BSD 3-clause, in addition to the GPL clause for this project.
+This file is part of pyautoeios.
 
-Modifications are Copyright (c) 2020, BrettMoan
+pyautoeios is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Original code from https://github.com/asweigart/pyautogui/blob/6bfa7a23b8ccba80d3211a473d7c496ff869d3a2/pyautogui/_pyautogui_win.py
+pyautoeios is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
+
+In order to integrate with the package pyautogui, some of the functions
+are derived from _pyautogui_win.py at
+<https://github.com/asweigart/pyautogui/blob/6bfa7a23b8ccba80d3211a473d7c496ff869d3a2/pyautogui/_pyautogui_win.py>
+
+Therefore, this file is also under BSD 3-clause, in addition to version 3 of the
+GPL. Note the GPLv3 is more restrictive than the BSD 3-clause. Be sure to study
+both licenses.
+
+Original code from
+<https://github.com/asweigart/pyautogui/blob/6bfa7a23b8ccba80d3211a473d7c496ff869d3a2/pyautogui/_pyautogui_win.py>
 Copyright (c) 2014, Al Sweigart
 All rights reserved.
+
+Modifications are Copyright (c) 2020, Brett J. Moan
+All rights reserved.
+
+# The BSD 3-clause:
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -53,7 +73,7 @@ eios_obj = None
 
 def _position():
     """compatibility wrapper for pyautogui."""
-    return EIOS._EIOS_GetMousePosition(eios_obj)
+    return EIOS.get_mouse_position(eios_obj)
 
 
 def _word_to_mouse_button(word: str):
@@ -71,20 +91,20 @@ def _word_to_mouse_button(word: str):
 def _click(x, y, button):
     """compatibility wrapper for pyautogui."""
     _button = _word_to_mouse_button(button)
-    EIOS._EIOS_HoldMouse(eios_obj, x, y, _button)
-    EIOS._EIOS_ReleaseMouse(eios_obj, x, y, _button)
+    EIOS.hold_mouse(eios_obj, x, y, _button)
+    EIOS.release_mouse(eios_obj, x, y, _button)
 
 
 def _mouseDown(x, y, button):
     """pyautogui wrapper for _position."""
     _button = _word_to_mouse_button(button)
-    EIOS._EIOS_HoldMouse(eios_obj, x, y, _button)
+    EIOS.hold_mouse(eios_obj, x, y, _button)
 
 
 def _mouseUp(x, y, button):
     """pyautogui wrapper for _position."""
     _button = _word_to_mouse_button(button)
-    EIOS._EIOS_ReleaseMouse(eios_obj, x, y, _button)
+    EIOS.release_mouse(eios_obj, x, y, _button)
 
 
 def _keyDown(key):
@@ -105,15 +125,15 @@ def _keyDown(key):
         (mods & 1 or needsShift, 0x10),
     ]:  # HANKAKU not suported! mods & 8
         if apply_mod:
-            EIOS._EIOS_HoldKey(eios_obj, vk_mod)
-    EIOS._EIOS_HoldKey(eios_obj, vkCode)
+            EIOS.hold_key(eios_obj, vk_mod)
+    EIOS.hold_key(eios_obj, vkCode)
     for apply_mod, vk_mod in [
         (mods & 1 or needsShift, 0x10),
         (mods & 2, 0x11),
         (mods & 4, 0x12),
     ]:  # HANKAKU not suported! mods & 8
         if apply_mod:
-            EIOS._EIOS_ReleaseKey(eios_obj, vk_mod)
+            EIOS.release_key(eios_obj, vk_mod)
 
 
 def _keyUp(key):
@@ -134,20 +154,20 @@ def _keyUp(key):
         (mods & 1 or needsShift, 0x10),
     ]:  # HANKAKU not suported! mods & 8
         if apply_mod:
-            EIOS._EIOS_HoldKey(eios_obj, vk_mod)
-    EIOS._EIOS_ReleaseKey(eios_obj, vkCode)
+            EIOS.hold_key(eios_obj, vk_mod)
+    EIOS.release_key(eios_obj, vkCode)
     for apply_mod, vk_mod in [
         (mods & 1 or needsShift, 0x10),
         (mods & 2, 0x11),
         (mods & 4, 0x12),
     ]:  # HANKAKU not suported! mods & 8
         if apply_mod:
-            EIOS._EIOS_ReleaseKey(eios_obj, vk_mod)
+            EIOS.release_key(eios_obj, vk_mod)
 
 
 def _moveTo(x, y):
     """compatibility wrapper for pyautogui."""
-    EIOS._EIOS_MoveMouse(eios_obj, x, y)
+    EIOS.move_mouse(eios_obj, x, y)
 
 
 def _scroll(clicks, x=None, y=None):
@@ -174,7 +194,7 @@ def _scroll(clicks, x=None, y=None):
         elif y >= height:
             y = height - 1
 
-    EIOS._EIOS_ScrollMouse(eios_obj, x, y, clicks)
+    EIOS.scroll_mouse(eios_obj, x, y, clicks)
 
 
 def _hscroll(clicks, x, y):
@@ -189,4 +209,4 @@ def _vscroll(clicks, x, y):
 
 def _size():
     """compatibility wrapper for pyautogui."""
-    return EIOS._EIOS_GetTargetDimensions(eios_obj)
+    return EIOS.get_target_dimensions(eios_obj)

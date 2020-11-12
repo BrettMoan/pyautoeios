@@ -1,3 +1,19 @@
+#    Copyright 2020 by Brett J. Moan
+#
+#    This file is part of pyautoeios.
+#
+#    pyautoeios is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    pyautoeios is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 import collections
 
 THook = collections.namedtuple("THook", "cls field desc multiplier")
@@ -435,3 +451,23 @@ CLIENT_EXPERIENCES = hook("client", "ln", "[I", 1)
 CLIENT_CURRENTWORLD = hook("client", "bb", "I", 380841186)
 CLIENT_ENERGY = hook("client", "mq", "I", 1875055983)
 CLIENT_WEIGHT = hook("client", "mt", "I", 373944835)
+
+
+### Hooks brandon doesn't have
+CLEAR_LOGIN_SCREEN = hook("cj", "b", "Z", 1)
+CURRENT_LOGIN_FIELD = hook("cj", "bp", "I", -1450671401)
+HOVERED_WORLD_INDEX = hook("cj", "by", "I", -374959449)
+LOGIN_BOX_X = hook("cj", "w", "I", -1076468107)
+LOGIN_INDEX = hook("cj", "au", "I", 1682315035)
+LOGIN_LOADING_PERCENT = hook("cj", "d", "I", -1330731251)
+LOGIN_LOADING_TEXT = hook("cj", "a", "Ljava/lang/String;", 1)
+LOGIN_PASSWORD = hook("cj", "an", "Ljava/lang/String;", 1)
+LOGIN_RESPONSE0 = hook("cj", "ai", "Ljava/lang/String;", 1)
+LOGIN_RESPONSE1 = hook("cj", "ax", "Ljava/lang/String;", 1)
+LOGIN_RESPONSE2 = hook("cj", "ag", "Ljava/lang/String;", 1)
+LOGIN_RESPONSE3 = hook("cj", "aq", "Ljava/lang/String;", 1)
+LOGIN_USERNAME = hook("cj", "aw", "Ljava/lang/String;", 1)
+WORLD_SELECT_OPEN = hook("cj", "bl", "Z", 1)
+WORLD_SELECT_PAGE = hook("cj", "bq", "I", -1738897563)
+WORLD_SELECT_PAGES_COUNT = hook("cj", "bv", "I", 1533348533)
+LOGIN_X_PADDING = hook("cj", "l", "I", 1744707789)

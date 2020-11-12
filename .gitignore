@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# project specific files
+examples/get_window_screenshot.py
+private/*

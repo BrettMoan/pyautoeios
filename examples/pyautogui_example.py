@@ -1,34 +1,32 @@
+#    Copyright 2020 by Brett J. Moan
+#
+#    This file is part of pyautoeios.
+#
+#    pyautoeios is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    pyautoeios is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
+
 import random
 import getpass
 from pyscreeze import Box
 import pyautoeios as pyauto
 
 
-def move_to_spot_in_box(box, **kwargs):
-    print(f"box = {box}")
-    if "duration" not in kwargs:
-        kwargs["duration"] = random.uniform(0.3, 1.1)
-    if "tween" not in kwargs:
-        kwargs["tween"] = pyauto.easeOutQuad
-
-    cx, cy = pyauto.center(box)
-    x = random.randint(int(-1 * (box.width / 3)), int(box.width / 3)) + cx
-    y = random.randint(int(-1 * (box.height / 3)), int(box.height / 3)) + cy
-    print(f"x = {x}, y = {y}")
-    pyauto.moveTo(x, y, **kwargs)
-
-
-def click_on_spot_in_box(box, **kwargs):
-    move_to_spot_in_box(box, **kwargs)
-    pyauto.click(**kwargs)
-
-
 pyauto.inject_clients()
 for client in pyauto.clients:
     pyauto.pair_client(client)
-    click_on_spot_in_box(Box(left=398, top=271, width=148, height=40))
-    click_on_spot_in_box(Box(left=285, top=248, width=235, height=15))
+    pyauto.static.move_to_spot_in_box(Box(left=398, top=271, width=148, height=40))
+    pyauto.static.click_on_spot_in_box(Box(left=285, top=248, width=235, height=15))
     pyauto.typewrite(getpass.getpass(), interval=0.7)
     im = pyauto.screenshot()
     im.show()
-    click_on_spot_in_box(Box(left=238, top=301, width=148, height=41))
+    pyauto.static.click_on_spot_in_box(Box(left=238, top=301, width=148, height=41))

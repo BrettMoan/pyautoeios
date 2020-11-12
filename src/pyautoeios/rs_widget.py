@@ -1,3 +1,20 @@
+#    Copyright 2020 by Brett J. Moan
+#
+#    This file is part of pyautoeios.
+#
+#    pyautoeios is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    pyautoeios is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
+
 # annotations allows methods of a class to return an object of that class
 # i.e in in RSTile to annotate a return type of RSTile.
 # see this thread: https://stackoverflow.com/a/33533514/4188287
@@ -12,10 +29,9 @@ from pyautoeios import static
 from pyautoeios.rs_structures import RSType, get_rs_int_array, get_rs_string_array
 
 
-
-
 WidgetList = List["RSWidget"]
 W = TypeVar("W", List[WidgetList], WidgetList)
+
 
 class RSWidget(RSType):
     def name(self) -> str:
@@ -25,7 +41,7 @@ class RSWidget(RSType):
         raise NotImplementedError
 
     def id(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_WIDGETID)
+        return self.eios.get_int(self.ref, hooks.WIDGET_WIDGETID)
 
     def parent_id(self) -> int:
         return static.shr(self.id(), 16)
@@ -37,7 +53,7 @@ class RSWidget(RSType):
         raise NotImplementedError
 
     def item_id(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_ITEMID)
+        return self.eios.get_int(self.ref, hooks.WIDGET_ITEMID)
 
     def inventory_ids(self) -> List[int]:
         raise NotImplementedError
@@ -46,49 +62,49 @@ class RSWidget(RSType):
         raise NotImplementedError
 
     def item_amount(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_ITEMAMOUNT)
+        return self.eios.get_int(self.ref, hooks.WIDGET_ITEMAMOUNT)
 
     def texture_id(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_TEXTUREID)
+        return self.eios.get_int(self.ref, hooks.WIDGET_TEXTUREID)
 
     def actions(self) -> List[str]:
         raise NotImplementedError
 
     def action_type(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_ACTIONTYPE)
+        return self.eios.get_int(self.ref, hooks.WIDGET_ACTIONTYPE)
 
     def type_id(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_TYPE)
+        return self.eios.get_int(self.ref, hooks.WIDGET_TYPE)
 
     def is_hidden(self) -> bool:
         raise NotImplementedError
 
     def cycle(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_WIDGETCYCLE)
+        return self.eios.get_int(self.ref, hooks.WIDGET_WIDGETCYCLE)
 
     def absolute_x(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_ABSOLUTEX)
+        return self.eios.get_int(self.ref, hooks.WIDGET_ABSOLUTEX)
 
     def absolute_y(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_ABSOLUTEY)
+        return self.eios.get_int(self.ref, hooks.WIDGET_ABSOLUTEY)
 
     def relative_x(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_RELATIVEX)
+        return self.eios.get_int(self.ref, hooks.WIDGET_RELATIVEX)
 
     def relative_y(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_RELATIVEY)
+        return self.eios.get_int(self.ref, hooks.WIDGET_RELATIVEY)
 
     def scroll_x(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_SCROLLX)
+        return self.eios.get_int(self.ref, hooks.WIDGET_SCROLLX)
 
     def scroll_y(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_SCROLLY)
+        return self.eios.get_int(self.ref, hooks.WIDGET_SCROLLY)
 
     def width(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_WIDTH)
+        return self.eios.get_int(self.ref, hooks.WIDGET_WIDTH)
 
     def height(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_HEIGHT)
+        return self.eios.get_int(self.ref, hooks.WIDGET_HEIGHT)
 
     def parent(self) -> RSWidget:
         raise NotImplementedError
@@ -100,14 +116,14 @@ class RSWidget(RSType):
         raise NotImplementedError
 
     def bounds_index(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.WIDGET_BOUNDSINDEX)
+        return self.eios.get_int(self.ref, hooks.WIDGET_BOUNDSINDEX)
 
     def bounds_x(self) -> int:
         return get_rs_int_array(
             eios=self.eios,
             ref=None,
             hook=hooks.CLIENT_WIDGETPOSITIONX,
-            max_size=self.bounds_index()
+            max_size=self.bounds_index(),
         )
 
     def bounds_y(self) -> int:
@@ -115,7 +131,7 @@ class RSWidget(RSType):
             eios=self.eios,
             ref=None,
             hook=hooks.CLIENT_WIDGETPOSITIONY,
-            max_size=self.bounds_index()
+            max_size=self.bounds_index(),
         )
 
     def absolute_location(self) -> Point:

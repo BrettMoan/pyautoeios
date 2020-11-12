@@ -1,8 +1,25 @@
+#    Copyright 2020 by Brett J. Moan
+#
+#    This file is part of pyautoeios.
+#
+#    pyautoeios is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    pyautoeios is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
+
 # annotations allows methods of a class to return an object of that class
 # i.e in in RSTile to annotate a return type of RSTile.
 # see this thread: https://stackoverflow.com/a/33533514/4188287
-from enum import Enum, auto
 from __future__ import annotations
+from enum import Enum, auto
 from typing import List, Optional, overload, Union
 
 from pyautoeios import hooks
@@ -23,7 +40,7 @@ class RSObjectType(Enum):
 
 class RSObjectDefinition(RSType):
     def id(self) -> int:
-        return self.eios._Reflect_Int(self.ref, hooks.OBJECTDEFINITION_ID)
+        return self.eios.get_int(self.ref, hooks.OBJECTDEFINITION_ID)
 
     def model_ids(self) -> List[int]:
         return get_rs_int_array(
@@ -43,7 +60,7 @@ class RSObjectDefinition(RSType):
         return len(self.models()) > 0
 
     def name(self) -> str:
-        return self.eios._Reflect_String(self.ref, hooks.OBJECTDEFINITION_NAME)
+        return self.eios.get_string(self.ref, hooks.OBJECTDEFINITION_NAME)
 
     def actions(self) -> List[str]:
         return get_rs_string_array(
@@ -63,11 +80,11 @@ class RSObjectDefinition(RSType):
         return len(self.transformations()) > 0
 
     def definition_cache(self) -> RSCache:
-        _ref = self.eios._Reflect_Object(None, hooks.OBJECTDEFINITION_DEFINITIONCACHE)
+        _ref = self.eios.get_object(None, hooks.OBJECTDEFINITION_DEFINITIONCACHE)
         return RSCache(self.eios, _ref)
 
     def model_cache(self) -> RSCache:
-        _ref = self.eios._Reflect_Object(None, hooks.OBJECTDEFINITION_MODELCACHE)
+        _ref = self.eios.get_object(None, hooks.OBJECTDEFINITION_MODELCACHE)
         return RSCache(self.eios, _ref)
 
     def definition(self, id: int) -> RSObjectDefinition:
@@ -77,14 +94,10 @@ class RSObjectDefinition(RSType):
         raise NotImplementedError
 
     def transform_varbit(self) -> int:
-        return self.eios._Reflect_Int(
-            self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARBIT
-        )
+        return self.eios.get_int(self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARBIT)
 
     def transform_varp(self) -> int:
-        return self.eios._Reflect_Int(
-            self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARP
-        )
+        return self.eios.get_int(self.ref, hooks.OBJECTDEFINITION_TRANSFORMATIONVARP)
 
     def transform(self) -> RSObjectDefinition:
         raise NotImplementedError
