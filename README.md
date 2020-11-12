@@ -6,6 +6,20 @@ Design decision was made to implements patches to https://github.com/asweigart/p
 that the remote_input so that interface can be used.
 
 
+Note that right now this is in ALPHA status. everything is subject to change in
+future releases. This is because I want the 1.0.0 release to actually be
+something people like using.
+
+That said. I welcome your usage and feedback so we can make this a good library
+for boting.
+
+Even if things will change before the 1.0.0 release, once something is in version
+control or pypi, its there forever. I have no intention of deleteing commits from
+github. (unless I am forced to by some lawyer somewhere)
+
+I think programming should be fun and enjoyable. For me, python is the fun
+language and botting games is a fun activiity. It allows an individual to remove
+the un fun "grind" of the game.
 
 Planned Features
   - [x] Works with python 3.8
@@ -14,10 +28,12 @@ Planned Features
   - [x] Transparent Image finding when opencv is installed
   - [x] Injecting into multiple clients (so threads can be used for multi-boxing)
   - [x] no known memory leaks.
+  - [x] pytest for unit testing as I go
 
 Backlog Features:
   - [ ] More examples?
-  - [ ] Installs Dependancies for you (for now use the [Pipfile](/Pipfile))
+  - [ ] Login screen world switcher logic
+  - [ ] Pip install, installs dependancies for you (for now use the [Pipfile](/Pipfile))
   - [ ] integration of color and other methods https://github.com/BenLand100/srbot/tree/master/srbot
   - [ ] porting modules from https://github.com/SRL/SRL or https://github.com/ollydev/SRL-Development
   - [ ] porting of "reflection" modules from https://github.com/Brandon-T/Reflection
@@ -52,12 +68,13 @@ def click_on_spot_in_box(box, **kwargs):
 pyauto.inject_clients()
 for client in pyauto.clients:
     pyauto.pair_client(client)
-    click_on_spot_in_box(Box(left=398, top=271, width=148, height=40))
-    click_on_spot_in_box(Box(left=285, top=248, width=235, height=15))
-    pyauto.typewrite(getpass.getpass(), interval=0.3)
+    password = getpass.getpass()
+    email = input("enter your username:")
     im = pyauto.screenshot()
     im.show()
-    click_on_spot_in_box(Box(left=238, top=301, width=148,height=41))
+    pyauto.static.login(client, email, password)
+    im = pyauto.screenshot()
+    im.show()
 ```
 
 
