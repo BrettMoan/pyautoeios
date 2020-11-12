@@ -14,17 +14,19 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
 
-from pyautoeios._internal.rs_player import me
+from pyautoeios._internal.rs_structures import RSType
+from pyautoeios import hooks
 
-# pylint: disable=protected-access, missing-function-docstring
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
+class RSNode(RSType):
+    def uid(self) -> int:
+        return self.eios.get_long(self.ref, hooks.NODE_UID)
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+    def previous(self):
+        _ref = self.eios.get_object(self.ref, hooks.NODE_PREV)
+        return RSNode(self.eios, _ref)
+
+    def next(self):
+        _ref = self.eios.get_object(self.ref, hooks.NODE_NEXT)
+        return RSNode(self.eios, _ref)

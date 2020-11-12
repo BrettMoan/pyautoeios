@@ -16,7 +16,7 @@
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 """Test pyautoeios.eios module."""
 from pyautoeios.eios import EIOS
-from pyautoeios.rs_client import RSClient
+from pyautoeios._internal.rs_client import RSClient
 
 # pylint: disable=protected-access, missing-function-docstring
 

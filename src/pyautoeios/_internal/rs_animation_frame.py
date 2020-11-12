@@ -14,17 +14,24 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
 
-from pyautoeios._internal.rs_player import me
+# annotations allows methods of a class to return an object of that class
+# i.e in in RSTile to annotate a return type of RSTile.
+# see this thread: https://stackoverflow.com/a/33533514/4188287
+from __future__ import annotations
+from typing import List
 
-# pylint: disable=protected-access, missing-function-docstring
+from pyautoeios import hooks
+from pyautoeios._internal.rs_animation import RSAnimation
+from pyautoeios._internal.rs_structures import RSType
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+class RSAnimationFrame(RSType):
+    def animation(self, index: int) -> RSAnimation:
+        raise NotImplementedError
+
+    def animations(self) -> List[RSAnimation]:
+        raise NotImplementedError
+
+    def get_frame(self, frame_id: int) -> RSAnimationFrame:
+        raise NotImplementedError

@@ -14,17 +14,26 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
 
-from pyautoeios._internal.rs_player import me
+import collections
+from typing import List
 
-# pylint: disable=protected-access, missing-function-docstring
+from pyautoeios import hooks
+from pyautoeios._internal.rs_tile import RSTile
+from pyautoeios._internal.rs_structures import RSType
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
+RSGroundItem = collections.namedtuple("RSGroundItem", "id stack_size tile")
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+
+class RSGroundObject(RSType):
+    def get_all(self) -> List[RSGroundItem]:
+        raise NotImplementedError
+
+    def get_item_by_id(self, item_id: int) -> List[RSGroundItem]:
+        raise NotImplementedError
+
+    def get_tile_by_id(self, item_id: int) -> List[RSTile]:
+        raise NotImplementedError
+
+    def get_items_at(self, x: int, y: int) -> List[RSGroundItem]:
+        raise NotImplementedError

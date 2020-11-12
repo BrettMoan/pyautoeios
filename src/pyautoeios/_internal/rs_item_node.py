@@ -14,17 +14,28 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
 
-from pyautoeios._internal.rs_player import me
+from typing import List
+from pyautoeios import hooks
+from pyautoeios._internal.rs_hash_table import RSHashTable
+from pyautoeios._internal.rs_structures import RSType, get_rs_int_array
 
-# pylint: disable=protected-access, missing-function-docstring
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
+class RSItemNode(RSType):
+    def item_ids(self) -> List[int]:
+        return get_rs_int_array(
+            eios=self.eios,
+            ref=self.ref,
+            hook=hooks.ITEMNODE_ITEMIDS,
+        )
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+    def item_quantities(self) -> List[int]:
+        return get_rs_int_array(
+            eios=self.eios,
+            ref=self.ref,
+            hook=hooks.ITEMNODE_ITEMQUANTITIES,
+        )
+
+    def hash_table(self) -> RSHashTable:
+        _ref = self.eios.get_object(None, hooks.ITEMNODE_CACHE)
+        return RSHashTable(self.eios, _ref)

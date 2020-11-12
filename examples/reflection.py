@@ -19,9 +19,9 @@ import ctypes
 import pyautoeios as pyauto
 from pyautoeios import hooks
 
-from pyautoeios.rs_player import me
+from pyautoeios._internal.rs_player import me
 
-from pyautoeios.rs_client import RSClient
+from pyautoeios._internal.rs_client import RSClient
 
 pyauto.inject_clients()
 client = pyauto.clients[0]

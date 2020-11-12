@@ -60,7 +60,11 @@ class EIOS(object, metaclass=EIOSMetaClass):
     """Classvariable to hold the list of clients PIDS and their EIOS pointers."""
 
     _objects = {}
-    """Classvariable to track all object pointers, so they can be free'd."""
+    """Classvariable to track object pointers, so they can be free'd."""
+
+    _untracked = {}
+    """Classvariable to track *all* object pointers, so they can be free'd."""
+
 
     def __enter__(self):
         return self
@@ -97,6 +101,7 @@ class EIOS(object, metaclass=EIOSMetaClass):
 
         self._clients[pid] = self._eios_ptr
         self._objects[pid] = {}
+        self._untracked[pid] = {}
         """An individual dict for just this client's object pointers"""
 
     @staticmethod
@@ -124,6 +129,12 @@ class EIOS(object, metaclass=EIOSMetaClass):
                 keys = self._objects.pop(self._pid).keys()
                 for ref in keys:
                     self.release_object(ref)
+
+            if self._pid in self._untracked:
+                keys = self._untracked.pop(self._pid).keys()
+                for ref in keys:
+                    self.release_object(ref)
+
 
             self._clients.pop(self._pid)
             # print(f"{self._clients = }")
@@ -319,9 +330,12 @@ class EIOS(object, metaclass=EIOSMetaClass):
 
     def get_object(self, jobject: JObject, hook: THook):
         """Wrap Reflect_Object."""
-        return EIOS._reflect_object(
+        _ref = EIOS._reflect_object(
             self._eios_ptr, jobject, hook.cls, hook.field, hook.desc
         )
+        self._untracked[self._pid][_ref] = 1
+        return _ref
+
 
     def is_same_object(self, first: JObject, second: JObject) -> bool:
         """Wrap Reflect_IsSame_Object."""
@@ -410,9 +424,11 @@ class EIOS(object, metaclass=EIOSMetaClass):
 
     def get_array(self, jobject: JObject, hook: THook):
         """Wrap Reflect_Array."""
-        return EIOS._reflect_array(
+        _ref = EIOS._reflect_array(
             self._eios_ptr, jobject, hook.cls, hook.field, hook.desc
         )
+        self._untracked[self._pid][_ref] = 1
+        return _ref
 
     def get_array_with_size(self, jobject: JObject, hook: THook):
         """Wrap Reflect_Array_With_Size."""
@@ -425,6 +441,8 @@ class EIOS(object, metaclass=EIOSMetaClass):
             hook.field,
             hook.desc,
         )
+        print(f"{_ref = }")
+        self._untracked[self._pid][_ref] = 1
         return (_ref, size.value)
 
     def get_array_size(self, jarray: JArray):
@@ -471,11 +489,15 @@ class EIOS(object, metaclass=EIOSMetaClass):
                     print(f"DEBUG: missmatch in eios.EIOS.get_array_index_from_pointer... {_value = }, {_value2 = }")
             return _value
 
+        data = arr_type.ctype.from_address(buffer_addr)
+
+        if arr_type == OBJECT:
+            self._untracked[self._pid][data.value] = 1
+
         if arr_type == OBJECT:
             _pointer_obj = ct.cast(buffer_addr, ct.POINTER(arr_type.ctype))
             return _pointer_obj.contents.value
 
-        data = arr_type.ctype.from_address(buffer_addr)
         if arr_type in [INT]:
             return data.value
 
@@ -494,7 +516,10 @@ class EIOS(object, metaclass=EIOSMetaClass):
             return value
 
         data = arr_type.ctype.from_address(buffer_addr)
-        return data
+        if arr_type == OBJECT:
+            self._untracked[self._pid][data.value] = 1
+        print(f"{buffer_addr = }, {data = }, {data.value = }")
+        return data.value
 
     def get_3d_array_index_from_pointer(self, instance, arr_type, x, y, z):
         buffer_addr = EIOS._reflect_array_index3d(

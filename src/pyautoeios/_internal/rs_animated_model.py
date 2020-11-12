@@ -14,17 +14,19 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
+from pyautoeios import hooks
+from pyautoeios._internal.rs_structures import RSType
 
-from pyautoeios._internal.rs_player import me
 
-# pylint: disable=protected-access, missing-function-docstring
+class RSAnimatedModel(RSType):
+    def triangle_faces(self):
+        raise NotImplementedError
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
+    def triangles(self):
+        raise NotImplementedError
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+    def animate(self):
+        raise NotImplementedError
+
+    def transform(self):
+        raise NotImplementedError

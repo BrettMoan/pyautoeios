@@ -14,17 +14,25 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
 
-from pyautoeios._internal.rs_player import me
+from typing import List, TypeVar
 
-# pylint: disable=protected-access, missing-function-docstring
+from pyautoeios import hooks
+from pyautoeios._internal.rs_object import RSObject
+from pyautoeios._internal.rs_structures import RSType
+from pyautoeios._internal.rs_scene_tile import RSSceneTile
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+Scene = List[List[RSSceneTile]]
+S = TypeVar("S", Scene, List[Scene])
+
+
+class RSRegion(RSType):
+    def scene_tiles(self, plane: int) -> S:
+        raise NotImplementedError
+
+    def scene_tile(self, x: int, y: int, z: int) -> RSSceneTile:
+        raise NotImplementedError
+
+    def interactable_objects(self) -> List[RSObject]:
+        raise NotImplementedError

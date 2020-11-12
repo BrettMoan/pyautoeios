@@ -17,11 +17,11 @@
 
 
 import pyautoeios as pyauto
-from pyautoeios.rs_client import RSClient
+from pyautoeios._internal.rs_client import RSClient
 from pyautoeios import hooks
-from pyautoeios.rs_structures import RSObjectArray
-from pyautoeios.rs_npc import RSNPC
-from pyautoeios.rs_npc_definition import RSNPCDefinition
+from pyautoeios._internal.rs_structures import RSObjectArray
+from pyautoeios._internal.rs_npc import RSNPC
+from pyautoeios._internal.rs_npc_definition import RSNPCDefinition
 
 pyauto.inject_clients()
 client = pyauto.clients[0]

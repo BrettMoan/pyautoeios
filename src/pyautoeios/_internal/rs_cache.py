@@ -14,17 +14,24 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
 
-from pyautoeios._internal.rs_player import me
+from pyautoeios import hooks
+from pyautoeios._internal.rs_iterable_hash_table import RSIterableHashTable
+from pyautoeios._internal.rs_queue import RSQueue
+from pyautoeios._internal.rs_structures import RSType
 
-# pylint: disable=protected-access, missing-function-docstring
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
+class RSCache(RSType):
+    def hash_table(self) -> RSIterableHashTable:
+        _ref = self.eios.get_object(self.ref, hooks.CACHE_HASHTABLE)
+        return RSIterableHashTable(self.eios, _ref)
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+    def queue(self) -> RSQueue:
+        _ref = self.eios.get_object(self.ref, hooks.CACHE_QUEUE)
+        return RSQueue(self.eios, _ref)
+
+    def remaining(self) -> int:
+        return self.eios.get_int(self.ref, hooks.CACHE_REMAINING)
+
+    def capacity(self) -> int:
+        return self.eios.get_int(self.ref, hooks.CACHE_CAPACITY)

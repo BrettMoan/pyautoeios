@@ -13,15 +13,19 @@ EIOS = pyauto.eios.EIOS
 
 PLAYER_EMAIL = os.environ.get("PLAYER_EMAIL", None)
 if not PLAYER_EMAIL:
-    os.environ["PLAYER_EMAIL"] = PLAYER_EMAIL = input(prompt="enter user email:")
+    os.environ["PLAYER_EMAIL"] = PLAYER_EMAIL = input(prompt="Enter user email:")
 
 PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
 if not PLAYER_NAME:
-    os.environ["PLAYER_NAME"] = PLAYER_NAME = input(prompt="enter expected username:")
+    os.environ["PLAYER_NAME"] = PLAYER_NAME = input(prompt="Enter expected username:")
 
 PLAYER_PASSWORD = os.environ.get("PLAYER_PASSWORD", None)
 if not PLAYER_PASSWORD:
-    os.environ["PLAYER_PASSWORD"] = PLAYER_PASSWORD = getpass(prompt="enter password:")
+    os.environ["PLAYER_PASSWORD"] = PLAYER_PASSWORD = getpass(prompt="Enter password:")
+
+PLAYER_STATS = os.environ.get("PLAYER_STATS", None)
+if not PLAYER_STATS:
+    os.environ["PLAYER_STATS"] = PLAYER_STATS = getpass(prompt="Enter player stats (in fmt [N,N,...N,N]):")
 
 
 @pytest.fixture(scope="session")

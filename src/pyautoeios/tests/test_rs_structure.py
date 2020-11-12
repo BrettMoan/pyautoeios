@@ -15,35 +15,35 @@
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 """Test pyautoeios.eios module."""
-from typing import List
+import json
+import os
 
 from pyautoeios import hooks
-from pyautoeios.eios import EIOS
-from pyautoeios import rs_structures
+from pyautoeios._internal import rs_structures
 
-# pylint: disable=protected-access, missing-function-docstring
+# pylint: disable=protected-access
 
-
-# fmt: off
-my_stats = [40, 34, 35, 39, 4, 12, 38, 30, 54, 1, 20, 35, 37, 60, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-# fmt: on
-
+PLAYER_STATS = json.loads(os.environ.get("PLAYER_STATS", None))
 
 def test_rs_int_array(client):
-
+    """
+    tests:
+        - pyautoeios.eios.EIOS.get_array
+        - pyautoeios._internal.rs_structures.RSIntArray
+    """
     _ref = client.get_array(None, hooks.CLIENT_CURRENTLEVELS)
     skills_array = rs_structures.RSIntArray(client, _ref)
-    assert my_stats == skills_array.all()
+    assert PLAYER_STATS == skills_array.all()
 
 def test_get_npcs_at_grand_exchanges(client):
     """
     tests:
-        - rs_structures.get_rs_int_array
-        - rs_structures.RSObjectArray
-        - rs_structures.RSType
-        - eios.EIOS.get_object
-        - eios.EIOS.get_string
-        - eios.EIOS.get_int
+        - pyautoeios._internal.rs_structures.get_rs_int_array
+        - pyautoeios._internal.rs_structures.RSObjectArray
+        - pyautoeios._internal.rs_structures.RSType
+        - pyautoeios.eios.EIOS.get_object
+        - pyautoeios.eios.EIOS.get_string
+        - pyautoeios.eios.EIOS.get_int
     """
     indices = rs_structures.get_rs_int_array(
         client, ref=None, hook=hooks.CLIENT_NPCINDICES, max_size=None

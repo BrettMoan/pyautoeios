@@ -15,23 +15,28 @@
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 
-import ctypes
-import pyautoeios as pyauto
+# annotations allows methods of a class to return an object of that class
+# i.e in in RSTile to annotate a return type of RSTile.
+# see this thread: https://stackoverflow.com/a/33533514/4188287
+from __future__ import annotations
+from typing import List
+
 from pyautoeios import hooks
-from pyautoeios._internal.rs_client import RSClient
+from pyautoeios._internal.rs_structures import RSType
 
-pyauto.inject_clients()
-client = pyauto.clients[0]
-rs_client = RSClient(client, None)
 
-menu_options = rs_client.menu_options()
-menu_actions = rs_client.menu_actions()
-print(f"{len(menu_options) = }")
-# print all the menu actions
-joined_and_filtered = [
-    " ".join(str(item)).strip()
-    for item in zip(menu_actions, menu_options)
-    if item[0] or item[1]
-]
-print(f"{len(joined_and_filtered) = } ")
-print(joined_and_filtered)
+class RSAnimationSkeleton(RSType):
+    def id(self) -> int:
+        raise NotImplementedError
+
+    def transform_count(self) -> int:
+        raise NotImplementedError
+
+    def transformation_types(self) -> List[int]:
+        raise NotImplementedError
+
+    def transformation(self, index: int) -> List[int]:
+        raise NotImplementedError
+
+    def transformations(self) -> List[List[int]]:
+        raise NotImplementedError
