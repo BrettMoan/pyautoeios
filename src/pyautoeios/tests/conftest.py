@@ -34,15 +34,18 @@ def client() -> EIOS:
         - eios.EIOS._eios_pair_client
 
     """
-    eios = pyauto.eios.EIOS()
+    _client = pyauto.eios.EIOS()
     assert (
-        isinstance(eios, pyauto.eios.EIOS)
-        and isinstance(eios._pid, int)
-        and isinstance(eios._eios_ptr, int)
+        isinstance(_client, pyauto.eios.EIOS)
+        and isinstance(_client._pid, int)
+        and isinstance(_client._eios_ptr, int)
     )
-    pyauto.pair_client(eios)
-    pyauto.static.login(eios, PLAYER_EMAIL, PLAYER_PASSWORD)
-    return eios
+    pyauto.pair_client(_client)
+    pyauto.static.login(_client, PLAYER_EMAIL, PLAYER_PASSWORD)
+    yield _client
+    pid = _client._pid
+    _client._cleanup()
+    assert not pyauto.eios.EIOS._objects.get(pid) and pid not in pyauto.eios.EIOS._clients.keys()
 
 
 

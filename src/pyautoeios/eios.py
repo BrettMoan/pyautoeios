@@ -124,7 +124,9 @@ class EIOS(object, metaclass=EIOSMetaClass):
                 keys = self._objects.pop(self._pid).keys()
                 for ref in keys:
                     self.release_object(ref)
-                self._clients.pop(self._pid)
+
+            self._clients.pop(self._pid)
+            # print(f"{self._clients = }")
 
             if self.get_eios(self._pid):
                 self.release_target()

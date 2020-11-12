@@ -25,7 +25,7 @@ from pyautoeios.hexcodes import VK_ESC, VK_LBUTTON
 
 PLAYER_EMAIL = os.environ.get("PLAYER_EMAIL", None)
 
-def test__get_client_pids():
+def test__get_client_pids(client):
     """
     Tests:
         - eios.EIOS._get_client_pids
@@ -34,13 +34,13 @@ def test__get_client_pids():
     assert isinstance(data, list) and len(data) == 1
 
 
-def test_get_clients():
+def test_get_clients(client):
     """
     Tests:
         - eios.EIOS._get_client_pids
     """
     data = pyauto.eios.EIOS.get_clients()
-    assert isinstance(data, list) and len(data) == 1
+    assert isinstance(data, int) and data == 1
 
 
 
@@ -83,6 +83,7 @@ def test_release_target(client):
     client.release_target()
     pyauto.eios.EIOS._eios_inject_pid(pid)
     new_ref = pyauto.eios.EIOS._eios_pair_client(pid)
+    client._eios_ptr = new_ref
     pyauto.eios.EIOS._clients[pid] = new_ref
     assert ref != new_ref
 
