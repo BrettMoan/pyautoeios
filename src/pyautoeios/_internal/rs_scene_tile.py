@@ -21,8 +21,8 @@
 from __future__ import annotations
 from typing import List
 
-from pyautoeios import hooks
-from pyautoeios import static
+from pyautoeios._internal import hooks
+from pyautoeios._internal import static
 from pyautoeios._internal.rs_structures import RSType
 from pyautoeios._internal.rs_object import RSObject, RSObjectType
 

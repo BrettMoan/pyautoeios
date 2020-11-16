@@ -33,7 +33,7 @@ import time
 
 import psutil
 
-from pyautoeios.hooks import THook
+from pyautoeios._internal.hooks import THook
 from pyautoeios.eios_meta import EIOSMetaClass, EIOSPtr, JObject, JArray, Type
 
 CLIENTS = ["JagexLauncher.exe", "RuneLite.exe", "OpenOSRS.exe"]
@@ -336,7 +336,6 @@ class EIOS(object, metaclass=EIOSMetaClass):
         self._untracked[self._pid][_ref] = 1
         return _ref
 
-
     def is_same_object(self, first: JObject, second: JObject) -> bool:
         """Wrap Reflect_IsSame_Object."""
         return EIOS._reflect_is_same_object(self._eios_ptr, first, second)
@@ -387,6 +386,7 @@ class EIOS(object, metaclass=EIOSMetaClass):
         value = EIOS._reflect_int(
             self._eios_ptr, jobject, hook.cls, hook.field, hook.desc
         )
+        # print(f"{value = }, {hook.multiplier = }")
         return ((value * hook.multiplier) + 2 ** 31) % 2 ** 32 - 2 ** 31
 
     def get_long(self, jobject: JObject, hook: THook) -> int:
@@ -450,23 +450,27 @@ class EIOS(object, metaclass=EIOSMetaClass):
         return EIOS._reflect_array_size(self._eios_ptr, jarray)
 
     def get_array_from_pointer(self, instance, arr_type, index, size):
-        buffer_addr = EIOS._reflect_array_index(
+        """Wrap Reflect_Array_Index."""
+        if not size:
+            size = self.get_array_size(instance)
+
+        _ref = EIOS._reflect_array_index(
             self._eios_ptr, instance, arr_type.value, index, size
         )
 
         if arr_type == STRING:
             result = [None] * size
             for i in range(size):
-                string_size = ct.c_size_t.from_address(buffer_addr).value
-                buffer_addr += SIZE.csize
+                string_size = ct.c_size_t.from_address(_ref).value
+                _ref += SIZE.csize
                 value = None
                 if string_size > 0:
-                    value = ct.c_char_p(buffer_addr).value.decode("utf8")
-                    buffer_addr += string_size + 1
+                    value = ct.c_char_p(_ref).value.decode("utf8")
+                    _ref += string_size + 1
                 result[i] = value
             return result
 
-        data = (arr_type.ctype * size).from_address(buffer_addr)
+        data = (arr_type.ctype * size).from_address(_ref)
         return data
 
     def get_array_index_from_pointer(self, instance, arr_type, index):
@@ -475,7 +479,7 @@ class EIOS(object, metaclass=EIOSMetaClass):
         )
 
         if arr_type == STRING:
-            _string_size = ct.c_size_t.from_address(buffer_addr).value
+            _string_size = SIZE.ctype.from_address(buffer_addr).value
             # print(f"{_string_size =}")
             _value = None
             if _string_size > 0:
@@ -498,10 +502,11 @@ class EIOS(object, metaclass=EIOSMetaClass):
             _pointer_obj = ct.cast(buffer_addr, ct.POINTER(arr_type.ctype))
             return _pointer_obj.contents.value
 
-        if arr_type in [INT]:
-            return data.value
+        return data.value
+        # if arr_type in [INT]:
+        #     return data.value
 
-        return data
+        # return data
 
     def get_2d_array_index_from_pointer(self, instance, arr_type, x, y):
         buffer_addr = EIOS._reflect_array_index2d(

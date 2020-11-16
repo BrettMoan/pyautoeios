@@ -18,7 +18,7 @@
 import json
 import os
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal import rs_structures
 
 # pylint: disable=protected-access

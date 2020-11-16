@@ -18,7 +18,7 @@
 from typing import List, Tuple
 
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_region import RSRegion
 from pyautoeios._internal.rs_model import RSModel
 from pyautoeios._internal.rs_cache import RSCache

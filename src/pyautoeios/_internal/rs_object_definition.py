@@ -22,9 +22,9 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import List, Optional, overload, Union
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios.eios import EIOS
-from pyautoeios import static
+from pyautoeios._internal import static
 from pyautoeios._internal.rs_structures import RSType, get_rs_int_array, get_rs_string_array
 from pyautoeios._internal.rs_cache import RSCache
 from pyautoeios._internal.rs_model import RSModel

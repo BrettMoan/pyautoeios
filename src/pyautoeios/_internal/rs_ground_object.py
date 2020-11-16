@@ -18,7 +18,7 @@
 import collections
 from typing import List
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_tile import RSTile
 from pyautoeios._internal.rs_structures import RSType
 

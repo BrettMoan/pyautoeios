@@ -20,12 +20,13 @@ import sys
 import time
 from typing import Tuple
 
-
 import pyautogui
 from pyscreeze import Box
 
+from pyautoeios._internal import hooks
+from pyautoeios._internal.rs_actor import base_x, base_y
+from pyautoeios._internal.rs_local_player import RSLocalPlayer
 from pyautoeios.eios import EIOS
-from pyautoeios import hooks
 
 _STATES = {
     (0, 10 , False): "WELCOME_SCREEN",
@@ -48,10 +49,20 @@ _STATES = {
 def game_state(eios: EIOS) -> int:
     return eios.get_int(None, hooks.CLIENT_GAMESTATE)
 
-
 def _is_client_loading(eios: EIOS) -> bool:
     return eios.get_bool(None, hooks.CLIENT_ISLOADING)
 
+def r_initialize_constants(eios: EIOS) -> None:
+    raise NotImplementedError
+
+def r_initialize_tile_settings(eios: EIOS) -> None:
+    raise NotImplementedError
+
+def r_initialize_tile_heights(eios: EIOS) -> None:
+    raise NotImplementedError
+
+def r_initialize_varp_masks(eios: EIOS) -> None:
+    raise NotImplementedError
 
 def is_client_loading(eios: EIOS) -> bool:
     _game_state = game_state(eios)
@@ -62,6 +73,9 @@ def is_client_loading(eios: EIOS) -> bool:
         or _is_client_loading(eios)
     )
 
+def update_region_cache(eios: EIOS) -> None:
+    raise NotImplementedError
+
 def loop_cycle(eios: EIOS) -> int:
     return eios.get_int(None, hooks.CLIENT_LOOPCYCLE)
 
@@ -71,11 +85,11 @@ def login_state(eios: EIOS) -> int:
 def get_client_dimensions(eios: EIOS) -> Tuple[int, int]:
     return eios.get_target_dimensions()
 
-def base_x(eios: EIOS) -> int:
-    return eios.get_int(None, hooks.CLIENT_BASEX)
+# def base_x(eios: EIOS) -> int:
+#     return eios.get_int(None, hooks.CLIENT_BASEX)
 
-def base_y(eios: EIOS) -> int:
-    return eios.get_int(None, hooks.CLIENT_BASEY)
+# def base_y(eios: EIOS) -> int:
+#     return eios.get_int(None, hooks.CLIENT_BASEY)
 
 def shr(x: int, y: int) -> int:
     return x >> y
@@ -253,6 +267,10 @@ def get_complex_state(eios: EIOS):
         print(f"{_login_state = }, {_game_state = }, {_loading = }")
         return "UNKNOWN_STATE"
     return _state
+
+
+def me(eios: EIOS) -> RSLocalPlayer:
+    return RSLocalPlayer(eios)
 
 
 

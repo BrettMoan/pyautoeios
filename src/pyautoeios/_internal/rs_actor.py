@@ -16,9 +16,15 @@
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 from pyscreeze import Point
 
-from pyautoeios import hooks
-from pyautoeios import static
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_structures import RSType
+from pyautoeios.eios import EIOS
+
+def base_x(eios: EIOS) -> int:
+    return eios.get_int(None, hooks.CLIENT_BASEX)
+
+def base_y(eios: EIOS) -> int:
+    return eios.get_int(None, hooks.CLIENT_BASEY)
 
 
 class RSActor(RSType):
@@ -38,8 +44,8 @@ class RSActor(RSType):
         return Point(self.local_x(), self.local_y())
 
     def tile(self) -> Point:
-        x = static.base_x(self.eios) + self.local_x() % 128
-        y = static.base_y(self.eios) + self.local_y() % 128
+        x = base_x(self.eios) + self.local_x() % 128
+        y = base_y(self.eios) + self.local_y() % 128
         return Point(x, y)
 
     def animation_id(self) -> int:

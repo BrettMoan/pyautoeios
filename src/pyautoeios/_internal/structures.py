@@ -15,12 +15,40 @@
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 
-from pyautoeios._internal.rs_structures import RSType
-from pyautoeios._internal import hooks
-from pyautoeios._internal.rs_node import RSNode
+
+from dataclasses import dataclass
+
+from pyscreeze import Point
+
+# pylint: disable=invalid-name
+
+@dataclass(frozen=True)
+class TVector:
+    __slots__ = ["x", "y", "z"]
+    x: int
+    y: int
+    z: int
+
+@dataclass(frozen=True)
+class TTriangle:
+    __slots__ = ["a", "b", "c"]
+    a: TVector
+    b: TVector
+    c: TVector
+
+#
+@dataclass(frozen=True)
+class T2DTriangle:
+    __slots__ = ["a", "b", "c"]
+    a: Point
+    b: Point
+    c: Point
 
 
-class RSQueue(RSType):
-    def head(self) -> RSNode:
-        _ref = self.eios.get_object(self.ref, hooks.QUEUE_HEAD)
-        return RSNode(self.eios, _ref)
+@dataclass(frozen=True)
+class T2DRectangle:
+    __slots__ = ["nw", "ne", "sw", "se"]
+    nw: Point
+    ne: Point
+    sw: Point
+    se: Point

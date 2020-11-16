@@ -16,7 +16,7 @@
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 
 from pyautoeios._internal.rs_structures import RSType
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 
 
 class RSNode(RSType):

@@ -18,7 +18,7 @@
 
 import pyautoeios as pyauto
 from pyautoeios._internal.rs_client import RSClient
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_structures import RSObjectArray
 from pyautoeios._internal.rs_npc import RSNPC
 

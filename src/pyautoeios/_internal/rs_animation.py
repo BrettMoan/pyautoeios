@@ -21,7 +21,7 @@
 from __future__ import annotations
 from typing import List
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_animation_skeleton import RSAnimationSkeleton
 from pyautoeios._internal.rs_structures import RSType, get_rs_int_array
 

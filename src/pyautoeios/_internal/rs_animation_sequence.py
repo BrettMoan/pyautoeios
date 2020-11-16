@@ -21,7 +21,7 @@
 from __future__ import annotations
 from typing import List
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_animated_model import RSAnimatedModel
 from pyautoeios._internal.rs_cache import RSCache
 from pyautoeios._internal.rs_model import RSModel

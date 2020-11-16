@@ -17,7 +17,7 @@
 
 from typing import List
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_node import RSNode
 from pyautoeios._internal.rs_cache import RSCache
 from pyautoeios._internal.rs_model import RSModel

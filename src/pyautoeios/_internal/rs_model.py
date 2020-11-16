@@ -17,7 +17,7 @@
 
 from typing import List, Tuple
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_structures import RSType
 
 

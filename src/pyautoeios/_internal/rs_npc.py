@@ -19,7 +19,7 @@ from typing import List
 
 from pyscreeze import Point
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_actor import RSActor
 from pyautoeios._internal.rs_model import RSModel
 from pyautoeios._internal.rs_npc_definition import RSNPCDefinition

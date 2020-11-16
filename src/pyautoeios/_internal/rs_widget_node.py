@@ -14,17 +14,18 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-import os
-from getpass import getpass
 
-from pyautoeios._internal.rs_player import me
+# annotations allows methods of a class to return an object of that class
+# i.e in in RSTile to annotate a return type of RSTile.
+# see this thread: https://stackoverflow.com/a/33533514/4188287
+from __future__ import annotations
 
-# pylint: disable=protected-access, missing-function-docstring
 
-PLAYER_NAME = os.environ.get("PLAYER_NAME", None)
-if not PLAYER_NAME:
-    PLAYER_NAME = getpass(prompt="enter expected username:")
+from pyautoeios._internal import hooks
+from pyautoeios._internal.rs_cache import RSCache
+from pyautoeios._internal.rs_node import RSNode
 
-def test_rs_player_me(client):
-    local_player = me(client)
-    assert PLAYER_NAME == local_player.name()
+
+class RSWidgetNode(RSNode):
+    def id(self) -> int:
+        return self.eios.get_int(self.ref, hooks.WIDGETNODE_ID)

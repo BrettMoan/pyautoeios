@@ -19,8 +19,8 @@ from typing import List
 
 from pyscreeze import Box, Point
 
-from pyautoeios import hooks
-from pyautoeios import static
+from pyautoeios._internal import hooks
+from pyautoeios._internal import static
 from pyautoeios.eios import EIOS
 from pyautoeios._internal.rs_npc import RSNPC
 from pyautoeios._internal.rs_cache import RSCache

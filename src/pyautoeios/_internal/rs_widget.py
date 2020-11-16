@@ -23,9 +23,9 @@ from typing import List, TypeVar
 
 from pyscreeze import Box, Point
 
-from pyautoeios import hooks
-from pyautoeios import static
-from pyautoeios.constants import RWidget
+from pyautoeios._internal import hooks
+from pyautoeios._internal import static
+from pyautoeios._internal.constants import RWidget
 from pyautoeios.eios import (
     # EIOS,
     # SIZE,
@@ -131,7 +131,9 @@ class RSWidget(RSType):
     def parent(self) -> RSWidget:
         raise NotImplementedError
 
-    def child(self, index: int) -> RSWidget:
+    def child(self, index: int = -1) -> RSWidget:
+        if index == -1:
+            raise ValueError
         _ref, _size = self.eios.get_array_with_size(self.ref, hooks.WIDGET_CHILDREN)
         if not _ref:
             return None

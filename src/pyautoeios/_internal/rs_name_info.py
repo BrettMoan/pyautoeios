@@ -15,12 +15,22 @@
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
 
-from pyautoeios._internal.rs_structures import RSType
+# annotations delays checking of type annotation in pytthon 3.7->3.9
+# this will become the default in python 3.10
+# see this thread: https://stackoverflow.com/a/33533514/4188287
+from __future__ import annotations
+
 from pyautoeios._internal import hooks
-from pyautoeios._internal.rs_node import RSNode
+from pyautoeios._internal.rs_structures import RSType
 
 
-class RSQueue(RSType):
-    def head(self) -> RSNode:
-        _ref = self.eios.get_object(self.ref, hooks.QUEUE_HEAD)
-        return RSNode(self.eios, _ref)
+class RSNameInfo(RSType):
+    def name(self):
+        return self.eios.get_string(self.ref, hooks.NAMEINFO_NAME).replace(
+            "\xa0", " "
+        )  # replace nbsp with space
+
+    def decoded_name(self):
+        return self.eios.get_string(self.ref, hooks.NAMEINFO_DECODEDNAME).replace(
+            "\xa0", " "
+        )  # replace nbsp with space

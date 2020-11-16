@@ -17,7 +17,7 @@
 
 from typing import List, TypeVar
 
-from pyautoeios import hooks
+from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_object import RSObject
 from pyautoeios._internal.rs_structures import RSType
 from pyautoeios._internal.rs_scene_tile import RSSceneTile

@@ -25,8 +25,8 @@ import random
 
 from pyautoeios import eios
 from pyautoeios import hexcodes
-from pyautoeios import static
-from pyautoeios import hooks
+from pyautoeios._internal import static
+from pyautoeios._internal import hooks
 from pyautoeios._internal import _pyscreeze_remoteinput_patch
 from pyautoeios._internal import _pyautogui_remoteinput_patch
 
@@ -72,4 +72,4 @@ def pair_client(eios_obj: eios.EIOS):
 
 
 __AUTHOR__ = "brett.moan@gmail.com"
-__VERSION__ = "0.0.6"
+__VERSION__ = "0.0.7"
