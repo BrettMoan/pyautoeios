@@ -99,7 +99,7 @@ def shl(x: int, y: int) -> int:
 
 
 def move_to_spot_in_box(box, **kwargs):
-    print(f"box = {box}")
+    # print(f"box = {box}")
     if "duration" not in kwargs:
         kwargs["duration"] = random.uniform(0.3, 1.1)
     if "tween" not in kwargs:
@@ -108,7 +108,7 @@ def move_to_spot_in_box(box, **kwargs):
     cx, cy = pyautogui.center(box)
     x = random.randint(int(-1 * (box.width / 3)), int(box.width / 3)) + cx
     y = random.randint(int(-1 * (box.height / 3)), int(box.height / 3)) + cy
-    print(f"x = {x}, y = {y}")
+    # print(f"x = {x}, y = {y}")
     pyautogui.moveTo(x, y, **kwargs)
 
 
@@ -264,7 +264,7 @@ def get_complex_state(eios: EIOS):
     _loading = _is_client_loading(eios)
     _state = _STATES.get((_login_state, _game_state, _loading), None)
     if not _state:
-        print(f"{_login_state = }, {_game_state = }, {_loading = }")
+        # print(f"{_login_state = }, {_game_state = }, {_loading = }")
         return "UNKNOWN_STATE"
     return _state
 

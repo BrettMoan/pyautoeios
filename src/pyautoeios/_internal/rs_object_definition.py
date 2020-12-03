@@ -39,7 +39,7 @@ class RSObjectType(Enum):
 
 
 class RSObjectDefinition(RSType):
-    def id(self) -> int:
+    def oid(self) -> int:
         return self.eios.get_int(self.ref, hooks.OBJECTDEFINITION_ID)
 
     def model_ids(self) -> List[int]:
@@ -87,10 +87,23 @@ class RSObjectDefinition(RSType):
         _ref = self.eios.get_object(None, hooks.OBJECTDEFINITION_MODELCACHE)
         return RSCache(self.eios, _ref)
 
-    def definition(self, id: int) -> RSObjectDefinition:
-        raise NotImplementedError
+    def definition(self, oid: int) -> RSObjectDefinition:
+        cache = self.definition_cache()
 
-    def model(self, id: int) -> RSModel:
+        if not cache.ref:
+            return None
+
+        hash_table = cache.hash_table()
+
+        if not hash_table.ref:
+            return None
+
+        return RSObjectDefinition(
+            eios=self.eios,
+            ref=hash_table.get_object(oid).ref,
+        )
+
+    def model(self, oid: int) -> RSModel:
         raise NotImplementedError
 
     def transform_varbit(self) -> int:

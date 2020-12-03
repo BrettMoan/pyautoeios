@@ -51,7 +51,7 @@ print(f"{widget = }")
 
 # print(f"{widget.name() = }")
 # print(f"{widget.text() = }")
-print(f"{widget.id() = }")
+print(f"{widget.oid() = }")
 # print(f"{widget.parent_id() = }")
 print(f"{widget.group_id() = }")
 print(f"{widget.child_id() = }")

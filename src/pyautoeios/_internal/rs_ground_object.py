@@ -22,7 +22,7 @@ from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_tile import RSTile
 from pyautoeios._internal.rs_structures import RSType
 
-RSGroundItem = collections.namedtuple("RSGroundItem", "id stack_size tile")
+RSGroundItem = collections.namedtuple("RSGroundItem", "oid stack_size tile")
 
 
 class RSGroundObject(RSType):

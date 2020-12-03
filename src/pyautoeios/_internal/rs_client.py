@@ -100,7 +100,7 @@ class RSClient(RSType):
         npcs_ref, npcs_size = self.eios.get_array_with_size(
             None, hooks.CLIENT_LOCALNPCS
         )
-        print(f"{npcs_ref = }, {npcs_size = }")
+        # print(f"{npcs_ref = }, {npcs_size = }")
         if npcs_ref:
             indices = self.npc_indices()
             shrunk = [i for i in indices if i]
@@ -150,7 +150,7 @@ class RSClient(RSType):
         width, height = static.get_client_dimensions(self.eios)
         return width != 765 or height != 503
 
-    def get_var_bit(self, id: int) -> int:
+    def get_var_bit(self, oid: int) -> int:
         raise NotImplementedError
 
     def menu_actions(self) -> List[str]:

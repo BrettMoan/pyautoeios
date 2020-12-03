@@ -87,7 +87,7 @@ class RSObject(RSType):
     def hash(self) -> int:
         return self.eios.get_long(self.ref, self.hash_hooks[self.object_type])
 
-    def id(self) -> int:
+    def oid(self) -> int:
         """
         TODO
         might need to un-hard-code this from 32, to be architecture agnostic

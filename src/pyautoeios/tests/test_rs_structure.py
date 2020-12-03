@@ -71,14 +71,14 @@ def test_get_npcs_at_grand_exchanges(client):
         if definition:
             _name = client.get_string(_ref, hooks.NPCDEFINITION_NAME)
             _id = client.get_int(_ref, hooks.NPCDEFINITION_ID)
-            npc_array.append({"name": _name, "id": _id})
+            npc_array.append({"name": _name, "oid": _id})
     for i in npc_array:
         print(i)
 
     assert (
         len(npc_array) > 1
-        and {"name": "Grand Exchange Clerk", "id": 2149} in npc_array
-        and {"name": "Grand Exchange Clerk", "id": 2151} in npc_array
-        and {"name": "Grand Exchange Clerk", "id": 2148} in npc_array
-        and {"name": "Grand Exchange Clerk", "id": 2150} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2149} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2151} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2148} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2150} in npc_array
     )

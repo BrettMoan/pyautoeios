@@ -346,7 +346,10 @@ class EIOS(object, metaclass=EIOSMetaClass):
 
     def release_object(self, jobject: JObject):
         """Wrap Reflect_Release_Object."""
-        # print(f"releasing {jobject = } from {self._eios_ptr = }")
+        try:
+            self._untracked[self._pid][jobject] -= 1
+        except KeyError:
+            pass
         EIOS._reflect_release_object(self._eios_ptr, jobject)
 
     def release_objects(self, objects: JArray):
@@ -441,7 +444,7 @@ class EIOS(object, metaclass=EIOSMetaClass):
             hook.field,
             hook.desc,
         )
-        print(f"{_ref = }")
+        # print(f"{_ref = }")
         self._untracked[self._pid][_ref] = 1
         return (_ref, size.value)
 
@@ -496,6 +499,7 @@ class EIOS(object, metaclass=EIOSMetaClass):
         data = arr_type.ctype.from_address(buffer_addr)
 
         if arr_type == OBJECT:
+            # print(f"{buffer_addr = }, {data = }, {data.value = }")
             self._untracked[self._pid][data.value] = 1
 
         if arr_type == OBJECT:
@@ -523,7 +527,7 @@ class EIOS(object, metaclass=EIOSMetaClass):
         data = arr_type.ctype.from_address(buffer_addr)
         if arr_type == OBJECT:
             self._untracked[self._pid][data.value] = 1
-        print(f"{buffer_addr = }, {data = }, {data.value = }")
+        # print(f"{buffer_addr = }, {data = }, {data.value = }")
         return data.value
 
     def get_3d_array_index_from_pointer(self, instance, arr_type, x, y, z):

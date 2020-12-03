@@ -57,7 +57,7 @@ class RSPlayer(RSActor):
         return self.eios.get_int(self.ref, hooks.ACTOR_QUEUESIZE) > 0
 
     def model(self) -> RSModel:
-        raise NotImplementedError
+        return self.definition().cached_model()
 
     def animated_model(self) -> RSAnimatedModel:
         raise NotImplementedError

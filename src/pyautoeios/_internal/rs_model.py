@@ -18,15 +18,21 @@
 from typing import List, Tuple
 
 from pyautoeios._internal import hooks
-from pyautoeios._internal.rs_structures import RSType
+from pyautoeios._internal.rs_structures import RSType, get_rs_int_array
 
 
 class RSModel(RSType):
     def raw_vertices(self) -> List[List[int]]:
-        raise NotImplementedError
+        x = get_rs_int_array(self.eios, self.ref, hooks.MODEL_VERTICESX)
+        y = get_rs_int_array(self.eios, self.ref, hooks.MODEL_VERTICESY)
+        z = get_rs_int_array(self.eios, self.ref, hooks.MODEL_VERTICESZ)
+        return [x, y, z]
 
     def raw_indices(self) -> List[List[int]]:
-        raise NotImplementedError
+        x = get_rs_int_array(self.eios, self.ref, hooks.MODEL_INDICESX)
+        y = get_rs_int_array(self.eios, self.ref, hooks.MODEL_INDICESY)
+        z = get_rs_int_array(self.eios, self.ref, hooks.MODEL_INDICESZ)
+        return [x, y, z]
 
     def vertices(self) -> List[Tuple[int, int, int]]:
         raise NotImplementedError

@@ -27,22 +27,12 @@ from pyautoeios._internal import hooks
 from pyautoeios._internal import static
 from pyautoeios._internal.constants import RWidget
 from pyautoeios.eios import (
-    # EIOS,
-    # SIZE,
-    # CHAR,
-    # BYTE,
-    # BOOL,
-    # SHORT,
-    # INT,
-    # LONG,
-    # FLOAT,
-    # DOUBLE,
-    # STRING,
-    OBJECT,
+    EIOS, OBJECT,
+    # SIZE, CHAR, BYTE, BOOL, SHORT, INT, LONG, FLOAT, DOUBLE, STRING,
 )
 
 
-from pyautoeios._internal.rs_structures import RSType, get_rs_int_array, get_rs_string_array, get_rs_object_array
+from pyautoeios._internal.rs_structures import RSType, get_rs_int_array
 
 
 WidgetList = List["RSWidget"]
@@ -56,17 +46,26 @@ class RSWidget(RSType):
     def text(self) -> str:
         raise NotImplementedError
 
-    def id(self) -> int:
+    def oid(self) -> int:
         return self.eios.get_int(self.ref, hooks.WIDGET_WIDGETID)
 
     def parent_id(self) -> int:
+        parent_id = self.eios.get_int(self.ref, hooks.WIDGET_PARENTID)
+        if parent_id > 0:
+            return parent_id
+
+        _ref = self.eios.get_object(None, hooks.CLIENT_WIDGETNODECACHE)
+        if _ref is None:
+            return -1
+
         raise NotImplementedError
+        # hash_table =
 
     def group_id(self) -> int:
-        return static.shr(self.id(), 16)
+        return static.shr(self.oid(), 16)
 
     def child_id(self) -> int:
-        return self.id() & 0xFFFF
+        return self.oid() & 0xFFFF
 
     def item_id(self) -> int:
         return self.eios.get_int(self.ref, hooks.WIDGET_ITEMID)
@@ -129,7 +128,10 @@ class RSWidget(RSType):
         return self.eios.get_int(self.ref, hooks.WIDGET_HEIGHT)
 
     def parent(self) -> RSWidget:
-        raise NotImplementedError
+        parent_id = self.parent_id()
+        if parent_id > 0:
+            return self.get_parent(parent_id=parent_id)
+        return None
 
     def child(self, index: int = -1) -> RSWidget:
         if index == -1:
@@ -174,7 +176,7 @@ class RSWidget(RSType):
 
     def get(self, container_index: int, parent: int, child: int = -1) -> RSWidget:
         _ref = self.eios.get_array(None, hooks.CLIENT_WIDGETS)
-        print(f"{_ref = }")
+        # print(f"{_ref = }")
         if not _ref:
             return None
 
@@ -184,19 +186,19 @@ class RSWidget(RSType):
                 x=container_index,
                 y=parent,
             )
-        print(f"{widget_ref = }")
+        # print(f"{widget_ref = }")
 
         widget = RSWidget(self.eios, widget_ref)
-        print(f"{widget = }")
+        # print(f"{widget = }")
 
         if child == -1:
             self.eios.release_object(_ref)
             return widget
 
-        print(f"{child = }")
+        # print(f"{child = }")
         child_widget = widget.child(child)
 
-        print(f"{child_widget = }")
+        # print(f"{child_widget = }")
 
         self.eios.release_object(_ref)
         return child_widget
@@ -210,10 +212,13 @@ class RSWidget(RSType):
     def valid_interfaces(self) -> List[bool]:
         raise NotImplementedError
 
-    @classmethod
-    def is_valid(cls, group: int, child: int, index: int = -1) -> bool:
-        widget = cls.get(group,child,index)
-        return widget is not None and not widget.is_hidden()
+    def is_valid(self, group: int, child: int, index: int = -1) -> bool:
+        widget = self.eios.get(group, child, index)
+        return widget.ref is not None and not widget.is_hidden()
 
     def widgets(self, index: int = None) -> W:
         raise NotImplementedError
+
+
+def is_valid_widget(client: EIOS, group: int, child: int, index: int = -1) -> bool:
+    return RSWidget(client, None).is_valid(group, child, index)

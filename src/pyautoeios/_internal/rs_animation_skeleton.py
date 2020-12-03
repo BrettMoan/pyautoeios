@@ -26,7 +26,7 @@ from pyautoeios._internal.rs_structures import RSType
 
 
 class RSAnimationSkeleton(RSType):
-    def id(self) -> int:
+    def oid(self) -> int:
         raise NotImplementedError
 
     def transform_count(self) -> int:

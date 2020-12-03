@@ -65,7 +65,7 @@ import ctypes
 #         if definition:
 #             npc_array.append({
 #                 "name": definition.name(),
-#                 "id" : definition.id(),
+#                 "oid" : definition.oid(),
 #             })
 npcs = rs_client.all_npcs()
 # npc = npcs[0]
@@ -77,7 +77,7 @@ for npc in npcs:
         npc_array.append(
             {
                 "name": definition.name(),
-                "id": definition.id(),
+                "oid": definition.oid(),
             }
         )
 

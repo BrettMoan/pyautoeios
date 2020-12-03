@@ -27,5 +27,5 @@ from pyautoeios._internal.rs_node import RSNode
 
 
 class RSWidgetNode(RSNode):
-    def id(self) -> int:
+    def oid(self) -> int:
         return self.eios.get_int(self.ref, hooks.WIDGETNODE_ID)

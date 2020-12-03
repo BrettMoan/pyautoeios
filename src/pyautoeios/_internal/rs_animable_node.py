@@ -23,7 +23,7 @@ from pyautoeios._internal.rs_tile import RSTile
 
 
 class RSAnimableNode(RSType):
-    def id(self) -> int:
+    def oid(self) -> int:
         return self.eios.get_int(self.ref, hooks.ANIMABLENODE_ID)
 
     def animation_sequence(self) -> RSAnimationSequence:
@@ -31,7 +31,7 @@ class RSAnimableNode(RSType):
         return RSAnimationSequence(self.eios, _ref)
 
     def animation_frame_id(self) -> int:
-        return self.id()
+        return self.oid()
 
     def flags(self) -> int:
         return self.eios.get_int(self.ref, hooks.ANIMABLENODE_FLAGS)

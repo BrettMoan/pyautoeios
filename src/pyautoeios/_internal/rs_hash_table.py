@@ -43,5 +43,21 @@ class RSHashTable(RSType):
     def size(self) -> int:
         return self.eios.get_int(self.ref, hooks.HASHTABLE_SIZE)
 
-    def get_object(self, id: int) -> RSNode:
-        raise NotImplementedError
+    def get_object(self, oid: int) -> RSNode:
+        index = oid & (self.size() - 1)
+        head = self.bucket(index)
+        if not head.ref:
+            return None
+
+        current = head.next()
+        if not current.ref:
+            return None
+
+        current_uid = None
+        while True:
+            current_uid = current.uid()
+            if current_uid in (0, -1):
+                return None
+            if current_uid == oid:
+                return current
+            current = current.next()

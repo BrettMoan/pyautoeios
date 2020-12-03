@@ -34,7 +34,7 @@ from pyautoeios._internal.rs_animation_sequence import RSAnimationSequence
 
 
 class RSNPCDefinition(RSType):
-    def id(self):
+    def oid(self):
         return self.eios.get_int(self.ref, hooks.NPCDEFINITION_ID)
 
     def name(self):

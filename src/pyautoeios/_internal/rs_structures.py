@@ -65,10 +65,6 @@ class RSType:
             eios._objects[eios._pid][ref] = eios._objects[eios._pid].get(ref, 0) + 1
             if self.ref in self.eios._untracked[self.eios._pid]:
                 self.eios._untracked[self.eios._pid].pop(self.ref)
-            else:
-                raise RuntimeError(f"TODO untracked ref!!! {self = }")
-
-
 
     def __str__(self):
         return f"{self.__class__.__name__}({self.ref}) paired with {self.eios}"

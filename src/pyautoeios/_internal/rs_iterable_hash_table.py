@@ -19,7 +19,7 @@ from typing import List
 
 from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_node import RSNode
-from pyautoeios._internal.rs_structures import RSType
+from pyautoeios._internal.rs_structures import RSType, RSObjectArray
 
 
 class RSIterableHashTable(RSType):
@@ -31,16 +31,11 @@ class RSIterableHashTable(RSType):
         _ref = self.eios.get_object(self.ref, hooks.ITERABLEHASHTABLE_TAIL)
         return RSNode(self.eios, _ref)
 
-    def bucket(self, Index: int) -> RSNode:
-        raise NotImplementedError
-        # Buckets: Pointer;
-        # BucketsSize: int;
-        # Buckets := RGetArray(R_EIOS, ref, BucketsSize, ITERABLEHASHTABLE_BUCKETS);
-        # if Buckets = nil then
-        #     Exit;
-
-        # Result.ref := RGetObjectArray(R_EIOS, Buckets, Index);
-        # RFreeObject(R_EIOS, Buckets);
+    def bucket(self, index: int) -> RSNode:
+        array_ref, size = self.eios.get_array_with_size(self.ref, hooks.ITERABLEHASHTABLE_BUCKETS)
+        buckets = RSObjectArray(self.eios, array_ref, size)
+        _ref = buckets[index]
+        return RSNode(self.eios, _ref)
 
     def buckets(self) -> List[RSNode]:
         raise NotImplementedError
@@ -67,23 +62,23 @@ class RSIterableHashTable(RSType):
     def size(self) -> int:
         return self.eios.get_int(self.ref, hooks.ITERABLEHASHTABLE_SIZE)
 
-    def get_object(self, ID: int) -> RSNode:
-        raise NotImplementedError
-        # Index, HeadUID, CurrentUID: int;
-        # Head, Current: RSNode;
-        # Result.ref := nil;
-        # Index := ID and (self.Size - 1);
-        # Head := self.Bucket(Index);
+    def get_object(self, oid: int) -> RSNode:
+        index = oid & (self.size() - 1)
+        head = self.bucket(index)
+        # print(f"{index = }, {head = } , {head.uid() = }")
+        if not head.ref:
+            return None
 
-        # if Head.ref <> nil then
-        #     Current := Head.Next;
-        #     if Current.ref <> nil then
+        current = head.next()
+        # print(f"{current = }, {current.uid() = }")
+        if not current.ref:
+            return None
 
-        #         while HeadUID <> (CurrentUID := Current.UID) do
-        #             if CurrentUID = ID then
-        #                 Exit(Current);
-
-        #             if CurrentUID = -1 then
-        #                 break;
-
-        #             Current := Current.Next;
+        current_uid = None
+        while True:
+            current_uid = current.uid()
+            if current_uid in (0, -1):
+                return None
+            if current_uid == oid:
+                return current
+            current = current.next()

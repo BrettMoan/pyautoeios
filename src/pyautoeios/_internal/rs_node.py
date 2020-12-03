@@ -29,4 +29,5 @@ class RSNode(RSType):
 
     def next(self):
         _ref = self.eios.get_object(self.ref, hooks.NODE_NEXT)
-        return RSNode(self.eios, _ref)
+        # print(f"{_ref = }")
+        return RSNode(self.eios, ref=_ref)

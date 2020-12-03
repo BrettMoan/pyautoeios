@@ -14,10 +14,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with pyautoeios.  If not, see <https://www.gnu.org/licenses/>.
-from pyscreeze import Point
 
 from pyautoeios._internal import hooks
 from pyautoeios._internal.rs_structures import RSType
+from pyautoeios._internal.rs_tile import RSTile
+
 from pyautoeios.eios import EIOS
 
 def base_x(eios: EIOS) -> int:
@@ -40,13 +41,13 @@ class RSActor(RSType):
     def local_y(self) -> int:
         return self.eios.get_int(self.ref, hooks.ACTOR_LOCALY)
 
-    def local_tile(self) -> Point:
-        return Point(self.local_x(), self.local_y())
+    def local_tile(self) -> RSTile:
+        return RSTile(eios=self.eios, x=self.local_x(), y=self.local_y())
 
-    def tile(self) -> Point:
+    def tile(self) -> RSTile:
         x = base_x(self.eios) + self.local_x() % 128
         y = base_y(self.eios) + self.local_y() % 128
-        return Point(x, y)
+        return RSTile(eios=self.eios, x=x, y=y)
 
     def animation_id(self) -> int:
         return self.eios.get_int(self.ref, hooks.ACTOR_ANIMATION)

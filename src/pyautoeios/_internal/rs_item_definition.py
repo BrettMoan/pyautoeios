@@ -27,7 +27,7 @@ from pyautoeios._internal.rs_structures import RSType, get_rs_string_array
 
 
 class RSItemDefinition(RSType):
-    def id(self) -> int:
+    def oid(self) -> int:
         return self.eios.get_int(self.ref, hooks.ITEMDEFINITION_ID)
 
     def name(self) -> str:
@@ -54,5 +54,5 @@ class RSItemDefinition(RSType):
         _ref = self.eios.get_object(None, hooks.ITEMDEFINITION_CACHE)
         return RSCache(self.eios, _ref)
 
-    def get(self, id: int) -> RSItemDefinition:
+    def get(self, oid: int) -> RSItemDefinition:
         raise NotImplementedError

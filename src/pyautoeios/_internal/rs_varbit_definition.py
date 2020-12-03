@@ -40,5 +40,5 @@ class RSVarbitDefinition(RSType):
         _ref = self.eios.get_object(None, hooks.VARBITDEFINITION_CACHE)
         return RSCache(self.eios, _ref)
 
-    def definition(self, id: int) -> RSVarbitDefinition:
+    def definition(self, oid: int) -> RSVarbitDefinition:
         raise NotImplementedError

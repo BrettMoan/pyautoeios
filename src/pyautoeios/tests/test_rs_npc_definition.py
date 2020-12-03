@@ -26,7 +26,7 @@ def test_get_npcs_at_grand_exchanges(client):
     tests:
         - rs_client.RSClient.all_npcs
         - rs_npc_definition.RSNPCDefinition.name
-        - rs_npc_definition.RSNPCDefinition.id
+        - rs_npc_definition.RSNPCDefinition.oid
     """
     rs_client = RSClient(client, None)
     npcs = rs_client.all_npcs()
@@ -37,15 +37,15 @@ def test_get_npcs_at_grand_exchanges(client):
             npc_array.append(
                 {
                     "name": definition.name(),
-                    "id": definition.id(),
+                    "oid": definition.oid(),
                 }
             )
     for i in npc_array:
         print(i)
     assert (
         len(npc_array) > 1
-        and {"name": "Grand Exchange Clerk", "id": 2149} in npc_array
-        and {"name": "Grand Exchange Clerk", "id": 2151} in npc_array
-        and {"name": "Grand Exchange Clerk", "id": 2148} in npc_array
-        and {"name": "Grand Exchange Clerk", "id": 2150} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2149} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2151} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2148} in npc_array
+        and {"name": "Grand Exchange Clerk", "oid": 2150} in npc_array
     )

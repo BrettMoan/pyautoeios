@@ -21,7 +21,7 @@ from pyautoeios._internal.rs_item_definition import RSItemDefinition
 
 
 class RSItem(RSType):
-    def id(self) -> int:
+    def oid(self) -> int:
         return self.eios.get_int(self.ref, hooks.ITEM_ID)
 
     def stack_sizes(self) -> int:

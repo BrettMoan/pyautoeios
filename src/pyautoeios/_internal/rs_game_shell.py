@@ -21,5 +21,5 @@ from pyautoeios._internal.rs_varbit_definition import RSVarbitDefinition
 
 
 class RSGameShell(RSType):
-    def get_var_bit(self, id: int) -> int:
+    def get_var_bit(self, oid: int) -> int:
         raise NotImplementedError

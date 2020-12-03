@@ -27,7 +27,7 @@ from pyautoeios._internal.rs_animation_sequence import RSAnimationSequence
 
 
 class RSPlayerDefinition(RSType):
-    def id(self) -> int:
+    def oid(self) -> int:
         return self.eios.get_int(self.ref, hooks.PLAYERDEFINITION_NPCTRANSFORMID)
 
     def is_female(self) -> bool:
@@ -49,7 +49,12 @@ class RSPlayerDefinition(RSType):
         return RSCache(eios=self.eios, ref=_ref)
 
     def cached_model(self) -> RSModel:
-        raise NotImplementedError
+        cache = self.model_cache()
+        if not self.ref or not cache.ref:
+            return None
+        model_id = self.animated_model_id()
+        node = cache.hash_table().get_object(model_id)
+        return RSModel(eios=self.eios, ref=node.ref)
 
     def get_model(
         self,
